@@ -1,6 +1,7 @@
 ﻿//Na het inladen van de html en css beginnen we met de javascript te verwerken
 //We laden de afbeeldingen in op het header element
-$('header').backstretch("../media/1001/5.jpg");
+var images = ['../media/1001/5.jpg', '../media/1002/736739_10151586674134403_805169855_o.jpg'];
+$('header').backstretch(images, { fade: 'slow', duration: '10000' });
 //Nadat de afbeelding is ingeladen wordt deze functie opgeroepen
 $(window).on("backstretch.after", function (e, instance, index) {
     //De code in de if wordt enkel uitgevoerd na de eerste afbeelding, zodat een slideshow later geen problemen geeft

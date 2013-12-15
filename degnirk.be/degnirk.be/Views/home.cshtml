@@ -1,9 +1,23 @@
-﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+﻿@using Our.Umbraco.uGoLive.Web
+@using System.Linq
+@using umbraco.MacroEngines
+@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
 @{
     Layout = "master.cshtml";
 }
 @section home
 {
+    @{
+        var mediaId = (int) @Model.Content.GetProperty("mediaPicker").Value;
+        var umbracoHelper = new UmbracoHelper(this.UmbracoContext);
+        var media = umbracoHelper.TypedMedia(mediaId);
+        var imagesInFolder = media.Children.Select(i => "'.." + i.Url + "'");
+        var images = string.Join(", ", imagesInFolder);
+    }
+    @Html.Raw(images)
+    <script language="javascript" type="text/javascript">
+        var images = [@Html.Raw(images)];
+    </script>
     <header>
         <div id="headerContent">
             <!--

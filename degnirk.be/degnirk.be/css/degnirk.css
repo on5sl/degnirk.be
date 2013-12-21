@@ -32,16 +32,12 @@
 			}
 
 			header {
-				display:table;
+				display:table !important;
 				width:100%;
 			}
 
 			header a, header {
 				color:#fff;
-			}
-
-			article{
-				height:200px;
 			}
 
 			#headerContent {
@@ -85,74 +81,32 @@
 				background: url("../images/degnirkouterring.png") no-repeat scroll 0 0 transparent;
 			}
 
-			nav {
-				font-family: league_gothicregular;
-				font-size: 40px;
+            nav, nav h2, nav h1 {
+                font-family: league_gothicregular;
+                font-size: 40px;
+                font-weight: normal;
+                line-height: normal;
+            }
+
+			header nav {
 				display:none;
 			}
 
-			h1, h2, h3, h4, h5, h6 {
-				font-weight: normal;
-			}
+            header h1 {
+                font-size: 80px;
+            }
 
-			h1 {
-				font-size: 80px;
-			}
+            header h2 {
+                font-size: 40px;
+                display: inline-block;
+            }
 
-			h2 {
-				font-size: 40px;
-				display: inline-block;
-			}
-
-			h2 a:hover, h1 a:hover {
+			h2 a:hover, h1 a:hover, h2 a:focus, h1 a:focus {
 				text-shadow:2px 2px 4px #ccc;
+			    color: #fff;
+			    text-decoration: none;
 			}
 
 			#headerCentral {
-				/*width:1000px;*/
 				margin:auto;
 			}
-
-			#contentplaceholder {
-				/*width:1000px;*/
-				margin:auto;
-				margin-top:100px;
-			}
-
-			.sprite {
-				position: absolute;
-			}
-
-			/*
-			#topnav {
-				top:0;
-				right:0;
-				width:80px;
-				height:16px;
-				padding:10px;
-				border-bottom-left-radius:13px;
-				background-color: #000;
-				font-size: 14px;
-			}
-
-			#maillogo {
-				top:18px;
-				right:15px;
-				height:16px;
-				width:24px;
-				margin-left:-12px;
-				margin-top:-8px;
-			}
-
-			#facebooklogo {
-				top:18px;
-				right:49px;
-				height:16px;
-				width:16px;
-				margin-left:-8px;
-				margin-top:-8px;
-			}
-
-			#foursquarelogo {
-				right:75px;
-			}*//* EDITOR PROPERTIES - PLEASE DON'T DELETE THIS LINE TO AVOID DUPLICATE PROPERTIES */

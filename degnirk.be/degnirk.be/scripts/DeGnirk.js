@@ -38,30 +38,7 @@ $(document).ready(function () {
 
     //https://api.foursquare.com/v2/venues/4d7be2a0f260a093e61f30ba/herenow?client_id=3UFSGCLAXPLGASVZIWDYEF3NL24SDC1RYYS1DMKDTGFJQJ1L&client_secret=XK4WTKZHT2HTUP3OTBCX1G55IST1X2ZQHQNG1GDVYBB2KHWH&v=20130827
 
-    /*
-        var circle_path = {
-            center: [17,18],
-            radius: 26,
-            start: 90,
-            end: 0,
-            dir: -1
-        };
-
-        var mail_path = {
-            center: [21,18],
-            radius: 51,
-            start: 90,
-            end: 0,
-            dir: -1
-        };
-
-
-    $('h1').click(function(){
-        $('#facebooklogo').animate({path : new $.path.arc(circle_path)},1000);
-        $('#maillogo').animate({path : new $.path.arc(mail_path)},1000);
-        $('#topnav').animate({left : "-=50px"},1000);
-    })*/
-
+  
     //$("#crown").rotate(-15);
 });
 

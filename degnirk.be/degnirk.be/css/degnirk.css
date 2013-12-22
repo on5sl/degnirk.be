@@ -34,6 +34,7 @@
 			header {
 				display:table !important;
 				width:100%;
+			    z-index: auto !important;
 			}
 
 			header a, header {
@@ -81,15 +82,15 @@
 				background: url("../images/degnirkouterring.png") no-repeat scroll 0 0 transparent;
 			}
 
-            nav, nav h2, nav h1 {
+            #subnav, #subnav h2, #subnav h1 {
                 font-family: league_gothicregular;
-                font-size: 40px;
                 font-weight: normal;
                 line-height: normal;
             }
 
-			header nav {
+			#subnav {
 				display:none;
+			    font-size: 40px;
 			}
 
             header h1 {
@@ -106,3 +107,11 @@
 			    color: #fff;
 			    text-decoration: none;
 			}
+
+            #navbar {
+                display: none;
+            }
+
+            #content {
+                padding-top: 100px;
+            }

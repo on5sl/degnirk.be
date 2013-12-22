@@ -872,7 +872,7 @@
           
 					if (cap.isie&&self.opt.disableoutline) self.win.attr("hideFocus","true");  // IE, prevent dotted rectangle on focused div
 					if (cap.iswebkit&&self.opt.disableoutline) self.win.css({"outline":"none"});
-//          if (cap.isopera&&self.opt.disableoutline) self.win.css({"outline":"0"});  // Opera to test [TODO]
+//          if (cap.isopera&&self.opt.disableoutline) self.win.css({"outline":"0"});  // Opera to backgroundCssTop [TODO]
           
         }
         
@@ -1882,7 +1882,7 @@
       self.page.maxw = Math.max(0,self.page.w - self.view.w);
       
       if ((self.page.maxh==premaxh)&&(self.page.maxw==premaxw)&&(self.view.w==preview.w)) {
-        // test position        
+        // backgroundCssTop position        
         if (!self.ispage) {
           var pos = self.win.offset();
           if (self.lastposition) {

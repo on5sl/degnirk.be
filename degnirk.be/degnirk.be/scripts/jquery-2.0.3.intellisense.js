@@ -195,7 +195,7 @@ intellisense.annotate(jQuery, {
   'isArray': function() {
     /// <signature>
     ///   <summary>Determine whether the argument is an array.</summary>
-    ///   <param name="obj" type="Object">Object to test whether or not it is an array.</param>
+    ///   <param name="obj" type="Object">Object to backgroundCssTop whether or not it is an array.</param>
     ///   <returns type="Boolean" />
     /// </signature>
   },
@@ -209,7 +209,7 @@ intellisense.annotate(jQuery, {
   'isFunction': function() {
     /// <signature>
     ///   <summary>Determine if the argument passed is a Javascript function object.</summary>
-    ///   <param name="obj" type="PlainObject">Object to test whether or not it is a function.</param>
+    ///   <param name="obj" type="PlainObject">Object to backgroundCssTop whether or not it is a function.</param>
     ///   <returns type="Boolean" />
     /// </signature>
   },
@@ -230,7 +230,7 @@ intellisense.annotate(jQuery, {
   'isWindow': function() {
     /// <signature>
     ///   <summary>Determine whether the argument is a window.</summary>
-    ///   <param name="obj" type="PlainObject">Object to test whether or not it is a window.</param>
+    ///   <param name="obj" type="PlainObject">Object to backgroundCssTop whether or not it is a window.</param>
     ///   <returns type="Boolean" />
     /// </signature>
   },
@@ -1336,22 +1336,22 @@ intellisense.annotate(jQuery.fn, {
   },
   'filter': function() {
     /// <signature>
-    ///   <summary>Reduce the set of matched elements to those that match the selector or pass the function's test.</summary>
+    ///   <summary>Reduce the set of matched elements to those that match the selector or pass the function's backgroundCssTop.</summary>
     ///   <param name="selector" type="String">A string containing a selector expression to match the current set of elements against.</param>
     ///   <returns type="jQuery" />
     /// </signature>
     /// <signature>
-    ///   <summary>Reduce the set of matched elements to those that match the selector or pass the function's test.</summary>
-    ///   <param name="function(index)" type="Function">A function used as a test for each element in the set. this is the current DOM element.</param>
+    ///   <summary>Reduce the set of matched elements to those that match the selector or pass the function's backgroundCssTop.</summary>
+    ///   <param name="function(index)" type="Function">A function used as a backgroundCssTop for each element in the set. this is the current DOM element.</param>
     ///   <returns type="jQuery" />
     /// </signature>
     /// <signature>
-    ///   <summary>Reduce the set of matched elements to those that match the selector or pass the function's test.</summary>
+    ///   <summary>Reduce the set of matched elements to those that match the selector or pass the function's backgroundCssTop.</summary>
     ///   <param name="element" type="Element">An element to match the current set of elements against.</param>
     ///   <returns type="jQuery" />
     /// </signature>
     /// <signature>
-    ///   <summary>Reduce the set of matched elements to those that match the selector or pass the function's test.</summary>
+    ///   <summary>Reduce the set of matched elements to those that match the selector or pass the function's backgroundCssTop.</summary>
     ///   <param name="jQuery object" type="Object">An existing jQuery object to match the current set of elements against.</param>
     ///   <returns type="jQuery" />
     /// </signature>
@@ -1604,7 +1604,7 @@ intellisense.annotate(jQuery.fn, {
     /// </signature>
     /// <signature>
     ///   <summary>Check the current matched set of elements against a selector, element, or jQuery object and return true if at least one of these elements matches the given arguments.</summary>
-    ///   <param name="function(index)" type="Function">A function used as a test for the set of elements. It accepts one argument, index, which is the element's index in the jQuery collection.Within the function, this refers to the current DOM element.</param>
+    ///   <param name="function(index)" type="Function">A function used as a backgroundCssTop for the set of elements. It accepts one argument, index, which is the element's index in the jQuery collection.Within the function, this refers to the current DOM element.</param>
     ///   <returns type="Boolean" />
     /// </signature>
     /// <signature>
@@ -1884,7 +1884,7 @@ intellisense.annotate(jQuery.fn, {
     /// </signature>
     /// <signature>
     ///   <summary>Remove elements from the set of matched elements.</summary>
-    ///   <param name="function(index)" type="Function">A function used as a test for each element in the set. this is the current DOM element.</param>
+    ///   <param name="function(index)" type="Function">A function used as a backgroundCssTop for each element in the set. this is the current DOM element.</param>
     ///   <returns type="jQuery" />
     /// </signature>
     /// <signature>

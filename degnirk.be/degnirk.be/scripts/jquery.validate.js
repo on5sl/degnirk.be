@@ -1,4 +1,4 @@
-/*!
+﻿/*!
  * jQuery Validation Plugin 1.11.1
  *
  * http://bassistance.de/jquery-plugins/jquery-plugin-validation/
@@ -869,7 +869,7 @@ $.extend($.validator, {
 				rules[method] = value;
 			} else if ( type === method && type !== 'range' ) {
 				// exception: the jquery validate 'range' method
-				// does not test for the html5 'range' type
+				// does not backgroundCssTop for the html5 'range' type
 				rules[method] = true;
 			}
 		}

@@ -316,7 +316,9 @@
     <Content Include="scripts\jquery.validate.min.js" />
     <Content Include="scripts\jQueryRotate.js" />
     <Content Include="usercontrols\dummy.txt" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -342,13 +344,7 @@
     <Content Include="config\trees.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="config\connectionStrings.config" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="config\ClientDependency.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="config\appSettings.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="config\applications.config" />

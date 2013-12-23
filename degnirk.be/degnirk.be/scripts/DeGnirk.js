@@ -53,6 +53,15 @@ $(document).ready(function () {
         $("#degnirkouterring").rotate(angle2);
     }, 70);
 
+    // Scroll on click
+    $(document).on('click', 'header .scrollToHref', function (e) {
+        if (!($('html body').is('.error404'))) {
+            e.preventDefault();
+            var href = e.target.attributes['href'].nodeValue;
+            var distance = $(href).offset().top - $('#navbar').height() + 2;
+            $('html').animate({ scrollTop: distance }, { duration: 1000 });
+        }
+    });
 
     //https://api.foursquare.com/v2/venues/4d7be2a0f260a093e61f30ba/herenow?client_id=3UFSGCLAXPLGASVZIWDYEF3NL24SDC1RYYS1DMKDTGFJQJ1L&client_secret=XK4WTKZHT2HTUP3OTBCX1G55IST1X2ZQHQNG1GDVYBB2KHWH&v=20130827
 

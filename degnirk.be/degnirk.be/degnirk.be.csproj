@@ -71,6 +71,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\UmbracoCms.Core.7.0.1\lib\Examine.dll</HintPath>
     </Reference>
+    <Reference Include="Facebook">
+      <HintPath>..\packages\Facebook.6.4.2\lib\net45\Facebook.dll</HintPath>
+    </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\packages\HtmlAgilityPack.1.4.6\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
@@ -227,10 +230,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeTemplates\AddView\CSHTML\SurfaceController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\FacebookEventsModel.cs" />
     <Compile Include="Models\HomeModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -305,6 +310,27 @@
     <Content Include="config\404handlers.config" />
     <Content Include="bin\x86\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
     <Content Include="bin\amd64\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
+    <Content Include="CodeTemplates\Scaffolders\ViewTemplateCode.cs.t4" />
+    <Content Include="CodeTemplates\Scaffolders\View\ViewTemplate.cs.t4" />
+    <Content Include="CodeTemplates\Scaffolders\View\View.ps1" />
+    <Content Include="CodeTemplates\Scaffolders\SurfaceController\SurfaceControllerViewTemplate.cs.t4" />
+    <Content Include="CodeTemplates\Scaffolders\SurfaceController\SurfaceControllerTemplate.cs.t4" />
+    <Content Include="CodeTemplates\Scaffolders\SurfaceController\SurfaceController.ps1" />
+    <Content Include="CodeTemplates\Scaffolders\PartialView\PartialViewTemplate.cs.t4" />
+    <Content Include="CodeTemplates\Scaffolders\PartialView\PartialView.ps1" />
+    <Content Include="CodeTemplates\Scaffolders\MacroPartial\MacroPartialTemplate.cs.t4" />
+    <Content Include="CodeTemplates\Scaffolders\MacroPartial\MacroPartial.ps1" />
+    <Content Include="CodeTemplates\Scaffolders\CustomController\CustomControllerTemplate.cs.t4" />
+    <Content Include="CodeTemplates\Scaffolders\CustomController\CustomController.ps1" />
+    <Content Include="CodeTemplates\AddView\CSHTML\SurfaceController.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>SurfaceController.cshtml</LastGenOutput>
+    </Content>
+    <Content Include="CodeTemplates\AddView\CSHTML\SurfaceController.cshtml">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SurfaceController.tt</DependentUpon>
+    </Content>
     <None Include="scripts\jquery-2.0.3.intellisense.js" />
     <Content Include="scripts\dummy.txt" />
     <Content Include="scripts\jquery-2.0.3.js" />
@@ -330,6 +356,7 @@
     <Content Include="Views\home.cshtml" />
     <Content Include="Views\master.cshtml" />
     <Content Include="xslt\Web.config" />
+    <Content Include="Views\Partials\FacebookEvents.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -348,6 +375,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="config\applications.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

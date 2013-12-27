@@ -1,0 +1,24 @@
+<#@ Template Language="C#" HostSpecific="True" Inherits="DynamicTransform" #> 
+<#@ Output Extension="cshtml" #>
+<#if(String.IsNullOrEmpty(Model.Model)){ #>
+@model IPublishedContent
+
+<h1>@Model.Name</h1>
+
+<#}else{#>
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<<#= Model.Model#>>
+
+
+<!-- Render a field -->
+<h3>
+	@Umbraco.Field("introduction")
+</h3>
+
+
+<!-- Render a field with parameters -->
+@Umbraco.Field("bodyContent", insertBefore : "<h2>", insertAfter : "</h2>")
+
+<#}#>
+
+
+

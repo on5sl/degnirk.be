@@ -1,5 +1,7 @@
 ﻿@using System.Linq
+@using degnirk.be.Models
 @using umbraco.MacroEngines
+@using Umbraco.Web.UI.Umbraco.Create
 @inherits Umbraco.Web.Mvc.UmbracoTemplatePage
 @{
     Layout = "master.cshtml";
@@ -24,7 +26,7 @@
             </div>
             <div id="subnav" class="shadow">
                 <h1>
-                    <a href="#content" class="scrollToHref">JEUGDHUIS DE GNIRK</a>
+                    <a href="#home" class="scrollToHref">JEUGDHUIS DE GNIRK</a>
                 </h1>
                 <h2>
                     <a href="#evenementen" class="scrollToHref">EVENEMENTEN</a>
@@ -42,7 +44,7 @@
     </header>
 
     <div id="content" class="container">
-        <nav id="navbar" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <nav id="navbar" class="navbar navbar-default navbar-fixed-top" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span>
@@ -98,20 +100,7 @@
                 <button type="button" class="btn btn-default">Meer</button>
             </div>
             <div class="col-md-4" id="evenementen">
-                <h3>Evenementen</h3>
-                @*<h4>Stage De Gnirk 2.0</h4>*@
-                <ul class="list-group">
-                    <li class="list-group-item">
-                        <span class="badge">50 Aanwezig</span>
-                        <p class="list-group-item-heading"><a href="https://www.facebook.com/events/413280355438947/">Stage De Gnirk 2.0</a></p>
-                        <a href="https://www.facebook.com/events/413280355438947/"><img class="img-responsive img-rounded" src="/images/movienight.jpg" alt="movie night"/></a>
-                    </li>
-                    <li class="list-group-item">
-                        <span class="badge">120 Aanwezig</span>
-                        <p class="list-group-item-heading">Nacht van de jeugd heeft nu toch wel nen veel te fucking lange titel zekers?! Straks wordt da hier godverdomme afgekapt!</p>
-                        <img class="img-responsive img-rounded" src="/images/nachtvandejeugd.jpg" alt="nacht van de jeugd"/>
-                    </li>
-                </ul>
+                @{ Html.RenderPartial("~/Views/Partials/FacebookEvents.cshtml", new FacebookEventsModel()); }
             </div>
             <div class="col-sm-4">
                 <h3>Foto's</h3>

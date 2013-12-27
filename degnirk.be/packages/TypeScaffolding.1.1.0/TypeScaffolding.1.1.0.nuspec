@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>TypeScaffolding</id>
+    <version>1.1.0</version>
+    <authors>Oleg Aksenov</authors>
+    <owners>Oleg Aksenov</owners>
+    <licenseUrl>http://www.opensource.org/licenses/ms-pl.html</licenseUrl>
+    <projectUrl>http://typescaffolding.codeplex.com/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A fast and customizable way to add type to your project. You can specify property types or can use conventions. Visit the Project site to learn about output and conventions' customization. Inspired by MVCScaffolding.</description>
+    <summary>A fast and customizable way to add type to your project. You can specify property types or can use conventions.</summary>
+    <tags>Type Class MVC Scaffolding Scaffold Scaffolder</tags>
+    <dependencies>
+      <dependency id="T4Scaffolding.Core" version="1.0.0" />
+    </dependencies>
+  </metadata>
+</package>

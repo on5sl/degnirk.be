@@ -1,0 +1,25 @@
+<#@ Template Language="C#" HostSpecific="True" Inherits="DynamicTransform" #> 
+<#@ Output Extension="cshtml" #>
+@inherits UmbracoTemplatePage
+@{
+	<#if(String.IsNullOrEmpty(Model.Layout)){ #>
+	Layout = null;
+	<#}else{#>
+	Layout = "<#= Model.Layout#>.cshtml";	
+	<#}#>
+}
+
+
+<!-- Render the page name -->
+<h1>@Model.Content.Name</h1>
+
+<!-- Render a field -->
+<h3>
+	@Umbraco.Field("introduction")
+</h3>
+
+<!-- Or using dynamic -->
+@CurrentPage.introduction
+
+<!-- Render a field with parameters -->
+@Umbraco.Field("bodyContent", insertBefore : "<h2>", insertAfter : "</h2>")

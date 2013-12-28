@@ -1,0 +1,15 @@
+﻿@using degnirk.be.Models
+@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@{
+    Layout = "page.cshtml";
+}
+
+@section content
+{
+    @{
+        var titleproperty = Model.Content.GetProperty("title");
+        var title = titleproperty.HasValue ? titleproperty.Value.ToString() : Model.Content.Name;
+    }
+    <h2>@title</h2>
+    @{ Html.RenderPartial("~/Views/Partials/FacebookAlbums.cshtml", new FacebookAlbumsModel()); }
+}

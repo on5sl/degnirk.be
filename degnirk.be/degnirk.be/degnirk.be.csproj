@@ -235,6 +235,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\ExpandoHelper.cs" />
+    <Compile Include="Models\FacebookAlbumsModel.cs" />
     <Compile Include="Models\FacebookEventsModel.cs" />
     <Compile Include="Models\HomeModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -333,6 +335,7 @@
     </Content>
     <None Include="scripts\jquery-2.0.3.intellisense.js" />
     <Content Include="scripts\dummy.txt" />
+    <Content Include="scripts\home.js" />
     <Content Include="scripts\jquery-2.0.3.js" />
     <Content Include="scripts\jquery-2.0.3.min.js" />
     <None Include="scripts\jquery.validate-vsdoc.js" />
@@ -357,6 +360,9 @@
     <Content Include="Views\master.cshtml" />
     <Content Include="xslt\Web.config" />
     <Content Include="Views\Partials\FacebookEvents.cshtml" />
+    <Content Include="Views\content.cshtml" />
+    <Content Include="Views\page.cshtml" />
+    <Content Include="Views\Partials\FacebookAlbums.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

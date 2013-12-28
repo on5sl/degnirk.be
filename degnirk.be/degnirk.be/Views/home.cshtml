@@ -6,7 +6,7 @@
 @{
     Layout = "master.cshtml";
 }
-@section home
+@section bodycontent
 {
     @{
         var mediaId = (int)@Model.Content.GetProperty("mediaPicker").Value;
@@ -33,7 +33,7 @@
                 </h2>
                 &nbsp;-&nbsp;
                 <h2>
-                    <a href="#content">FOTO'S</a>
+                    <a href="#fotos" class="scrollToHref">FOTO'S</a>
                 </h2>
                 &nbsp;-&nbsp;
                 <h2>
@@ -103,7 +103,7 @@
                 @{ Html.RenderPartial("~/Views/Partials/FacebookEvents.cshtml", new FacebookEventsModel()); }
             </div>
             <div class="col-sm-4">
-                <h3>Foto's</h3>
+                <a href="fotos"><h3 id="fotos">Foto's</h3></a>
                 <p>Stage De Gnirk 2.0</p>
             </div>
         </div>
@@ -164,4 +164,8 @@
         </div>
         <footer class="bottom text-center">footer</footer>
     </div>
+}
+@section script
+{
+    <script src="~/scripts/home.js"></script>
 }

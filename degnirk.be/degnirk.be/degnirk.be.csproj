@@ -232,6 +232,7 @@
   <ItemGroup>
     <Compile Include="CodeTemplates\AddView\CSHTML\SurfaceController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -239,6 +240,7 @@
     <Compile Include="Models\FacebookAlbumsModel.cs" />
     <Compile Include="Models\FacebookEventsModel.cs" />
     <Compile Include="Models\HomeModel.cs" />
+    <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -335,6 +337,7 @@
     </Content>
     <None Include="scripts\jquery-2.0.3.intellisense.js" />
     <Content Include="scripts\dummy.txt" />
+    <Content Include="scripts\facebook.js" />
     <Content Include="scripts\home.js" />
     <Content Include="scripts\jquery-2.0.3.js" />
     <Content Include="scripts\jquery-2.0.3.min.js" />
@@ -363,6 +366,7 @@
     <Content Include="Views\content.cshtml" />
     <Content Include="Views\page.cshtml" />
     <Content Include="Views\Partials\FacebookAlbums.cshtml" />
+    <Content Include="Views\Partials\Login.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

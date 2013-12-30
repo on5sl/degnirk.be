@@ -92,6 +92,12 @@
         <h2 id="home">Home</h2>
         
         <div class="row">
+            <div class="col-sm-2">
+                @{ Html.RenderPartial("~/Views/Partials/Login.cshtml", new LoginModel()); }
+            </div>
+        </div>
+
+        <div class="row">
             <div class="col-sm-4">
                 <h3>Nieuws</h3>
                 <p>

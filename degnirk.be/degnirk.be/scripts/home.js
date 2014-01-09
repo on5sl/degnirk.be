@@ -1,7 +1,7 @@
 ﻿//Na het inladen van de html en css beginnen we met de javascript te verwerken
 //We laden de afbeeldingen in op het header element
 $('header').backstretch(images, { fade: 'slow', duration: '10000' });
-var backgroundCssTop;
+//var backgroundCssTop;
 //Nadat de afbeelding is ingeladen wordt deze functie opgeroepen
 $(window).on("backstretch.after", function (e, instance, index) {
     //De code in de if wordt enkel uitgevoerd na de eerste afbeelding, zodat een slideshow later geen problemen geeft
@@ -12,7 +12,7 @@ $(window).on("backstretch.after", function (e, instance, index) {
         //TODO: Dit kan beter vervangen door een reeks animaties zodat de tekst pas erin komt nadat het logo centraal staat
         $('#logoHolder').animate({ top: "0", opacity: "1" }, { duration: 1000 });
         $('#subnav').fadeIn(2000);
-        backgroundCssTop = parseFloat(instance.$img.css('top'), 10);
+        //backgroundCssTop = parseFloat(instance.$img.css('top'), 10);
     }
 });
 
@@ -24,13 +24,14 @@ $(document).ready(function () {
     $(window).resize(function () {
         $('header').height($(window).innerHeight);
     });
-
-    $(window).scroll(function () {
+    var temp = 0;
+    function test() {
         $('header').backstretch("pause");
         var scrollTop = $(window).scrollTop();
-        var coords = backgroundCssTop + (scrollTop / 2) + 'px';
+        var coords = (scrollTop / 2) + 'px';
         $('header img').css({
-            top: coords
+            transform: 'translate3d(0,' + coords + ',0)',
+            '-webkit-transform': 'translate3d(0,' + coords + ',0)'
         });
 
         if (scrollTop >= $('#content').offset().top - ($('#navbar').height())) {
@@ -38,10 +39,21 @@ $(document).ready(function () {
         } else {
             $('#navbar').hide();
         }
+    }
 
+    document.addEventListener('gesturechange', function () {
+        //alert('gesturechagne');
+        test();
     });
 
-    //$('body').niceScroll({ mousescrollstep: 20, cursorborder: '0px', cursorwidth: '7px', cursoropacitymax: 0.5 });
+    document.addEventListener("touchmove", function () {
+        //alert('touchmove');
+        test();
+    });
+
+    $(window).scroll(function () {
+        test();
+    });
 
     var angle1 = 0;
     setInterval(function () {
@@ -61,7 +73,7 @@ $(document).ready(function () {
             e.preventDefault();
             var href = e.target.attributes['href'].nodeValue;
             var distance = $(href).offset().top - $('#navbar').height() - 20;
-            $('html').animate({ scrollTop: distance }, { duration: 1000 });
+            $('html,body').animate({ scrollTop: distance }, { duration: 1000 });
         }
     });
 

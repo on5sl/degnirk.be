@@ -1,10 +1,4 @@
-﻿$(document).ready(function () {
-    //$('#navbar').show();
-
-});
-
-$('body').niceScroll({ mousescrollstep: 20, cursorborder: '0px', cursorwidth: '7px', cursoropacitymax: 0.5 });
-
+﻿//$('body').niceScroll({ mousescrollstep: 20, cursorborder: '0px', cursorwidth: '7px', cursoropacitymax: 0.5 });
 
 (function (i, s, o, g, r, a, m) {
     i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {

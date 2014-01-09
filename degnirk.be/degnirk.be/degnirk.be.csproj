@@ -335,9 +335,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SurfaceController.tt</DependentUpon>
     </Content>
+    <None Include="Properties\PublishProfiles\Local IIS.pubxml" />
     <None Include="scripts\jquery-2.0.3.intellisense.js" />
     <Content Include="scripts\dummy.txt" />
-    <Content Include="scripts\facebook.js" />
     <Content Include="scripts\home.js" />
     <Content Include="scripts\jquery-2.0.3.js" />
     <Content Include="scripts\jquery-2.0.3.min.js" />

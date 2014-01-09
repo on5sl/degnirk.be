@@ -19,24 +19,28 @@ namespace degnirk.be.Controllers
             HttpContext.Session["AccessToken"] = accessToken;
 
             var client = new FacebookClient(accessToken);
-            dynamic result = client.Get("me", new { fields = "name,id,email" });
+            dynamic user = client.Get("me", new { fields = "name,id,email" });
 
-
-            var member = Member.MakeNew(result.name, result.email, result.email, MemberType.GetByAlias("Member"), new User(0));
-            Member.AddMemberToCache(member);
+            this.MakeNewUmbracoMember(user);
 
             return Json(new
             {
-                id = result.id,
-                name = result.name,
-                email = result.email
+                id = user.id,
+                name = user.name,
+                email = user.email
             });
         }
 
-        private void MakeNewUmbracoMember(string firstName, string lastName, string email, string location, string birthday)
+        private void MakeNewUmbracoMember(dynamic user)
         {
             // First we check if the user doesn't already exist
-            // Then we make the member in Umbraco
+            if (!Member.IsMember(user.email))
+            {
+                // Then we make the member in Umbraco
+                var member = Member.MakeNew(user.name, user.email, user.email, MemberType.GetByAlias("Member"), new User(0));
+                Member.AddMemberToCache(member);
+            }
+            
         }
     }
 }

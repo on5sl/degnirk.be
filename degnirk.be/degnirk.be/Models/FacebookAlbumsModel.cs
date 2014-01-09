@@ -10,6 +10,7 @@ namespace degnirk.be.Models
     public class FacebookAlbumsModel
     {
         private const string AccessToken = "442171809217325|Q3rA6b68G7TuWYF1beRUNsLUe94";
+        private const string OwnerID = "56615007038";
         private readonly FacebookClient _facebookClient;
         public dynamic FacebookAlbums { get; private set; }
 
@@ -26,7 +27,7 @@ namespace degnirk.be.Models
                 {
                     q = new
                     {
-                        coverPids = "select name, link,aid, cover_pid from album where owner = 56615007038 AND photo_count > 0 ORDER BY created desc",
+                        coverPids = string.Format("select name, link,aid, cover_pid from album where owner = {0} AND photo_count > 0 ORDER BY created desc", OwnerID),
                         coverSrcs = "select src, src_big,aid from photo where pid in (select cover_pid from #coverPids)"
                     }
                 });

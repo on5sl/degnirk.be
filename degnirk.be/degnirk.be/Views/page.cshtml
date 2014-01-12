@@ -53,7 +53,7 @@
             <!-- /.navbar-collapse -->  
         </nav>
         <ol class="breadcrumb">
-            @foreach (var ancestor in Model.Content.Ancestors().Where(t => t.IsVisible()))
+            @foreach (var ancestor in Model.Content.Ancestors().Where(t => t.IsVisible()).Reverse())
             {
                 <li><a href="@ancestor.Url">@ancestor.Name</a></li>
             }

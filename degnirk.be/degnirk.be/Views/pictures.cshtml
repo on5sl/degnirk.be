@@ -1,0 +1,9 @@
+﻿@using degnirk.be.Models
+@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@{
+    Layout = "content.cshtml";
+}
+@section innercontent{
+    <p>Foto's</p>
+    @{ Html.RenderPartial("~/Views/Partials/FacebookAlbums.cshtml", new FacebookAlbumsModel()); }
+}

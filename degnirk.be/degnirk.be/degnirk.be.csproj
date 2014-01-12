@@ -366,6 +366,11 @@
     <Content Include="Views\page.cshtml" />
     <Content Include="Views\Partials\FacebookAlbums.cshtml" />
     <Content Include="Views\Partials\Login.cshtml" />
+    <Content Include="Views\events.cshtml" />
+    <Content Include="Views\aboutus.cshtml" />
+    <Content Include="Views\calendar.cshtml" />
+    <Content Include="Views\pictures.cshtml" />
+    <Content Include="Views\volunteers.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

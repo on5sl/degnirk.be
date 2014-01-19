@@ -3,7 +3,7 @@
 
 @using (Html.BeginUmbracoForm<LoginController>("HandleLogin"))
 {
-   
+    //the extended permissions: manage_pages,status_update are required for posting a status on behalf of the page
     <div class="fb-login-button" perms="user_birthday,email,user_location" data-show-faces="true" data-width="400" data-max-rows="1"></div>
 }
 

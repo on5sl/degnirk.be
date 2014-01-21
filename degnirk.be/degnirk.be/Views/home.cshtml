@@ -8,13 +8,13 @@
     
     @helper Traverse(IPublishedContent node)
 {
-    const int maxLevelForSitemap = 3;
+    const int maxLevelForSitemap = 2;
 
     var values = new Dictionary<string, object>();
     var items = node.Children.Where(i => i.IsVisible() && i.Level <= maxLevelForSitemap);
     foreach (var item in items)
     {
-        if (@item.Children.Any())
+        if (item.Level < maxLevelForSitemap && @item.Children.Any())
         {
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">@item.Name <b class="caret"></b></a>

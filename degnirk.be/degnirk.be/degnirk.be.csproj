@@ -371,6 +371,8 @@
     <Content Include="Views\calendar.cshtml" />
     <Content Include="Views\pictures.cshtml" />
     <Content Include="Views\volunteers.cshtml" />
+    <Content Include="Views\rehearsel.cshtml" />
+    <Content Include="Views\rental.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

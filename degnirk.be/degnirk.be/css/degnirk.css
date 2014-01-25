@@ -142,3 +142,7 @@ h2 a:hover, h1 a:hover, h2 a:focus, h1 a:focus {
 #content {
     padding-top: 100px;
 }
+
+#fb-login-button {
+    display: none;
+}

@@ -4,10 +4,11 @@
 @using (Html.BeginUmbracoForm<LoginController>("HandleLogin"))
 {
     //the extended permissions: manage_pages,status_update are required for posting a status on behalf of the page
-    <div class="fb-login-button" perms="user_birthday,email,user_location" data-show-faces="true" data-width="400" data-max-rows="1"></div>
+    @*<div class="fb-login-button" perms="user_birthday,email,user_location" data-show-faces="false" data-width="400" data-max-rows="1"></div>*@
 }
 
 <script>
+
     window.fbAsyncInit = function () {
         FB.init({
             appId: '442171809217325', // App ID
@@ -26,13 +27,18 @@
                 // and signed request each expire
                 var uid = response.authResponse.userID;
                 var accessToken = response.authResponse.accessToken;
-                //var statusText = response.statusText;
+
+                //Change the login button when a user is logged in
+                $('.fb-login-button').hide();
+
+                //Call a function through AJAX for handling the user information when they logged in
                 $.post('@Url.Action("UserInfo", "Login")',
-                { 'accessToken': accessToken },
-                function (data, statusText) {
-                    var name = data.name;
-                    var id = data.id;
-                });
+                    { 'accessToken': accessToken },
+                    function (data, statusText) {
+                        var name = data.name;
+                        var id = data.id;
+                        $('#fb-login-button').text(name).show();
+                    });
             } else if (response.status === 'not_authorized') {
                 // the user is logged in to Facebook, 
                 // but has not authenticated your app

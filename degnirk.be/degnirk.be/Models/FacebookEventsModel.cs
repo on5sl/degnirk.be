@@ -38,7 +38,7 @@ namespace degnirk.be.Models
             {
                 return;
             }
-            this.FacebookEvents = (facebookEvents as IEnumerable<dynamic>).Select(fbevent => new 
+            this.FacebookEvents = (facebookEvents as IEnumerable<dynamic>).OrderBy(fbevent => fbevent.start_time).Select(fbevent => new 
             {
                 name = fbevent.name,
                 link = EventUri + fbevent.eid,

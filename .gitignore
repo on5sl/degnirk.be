@@ -218,4 +218,4 @@ pip-log.txt
 ## Umbraco
 ##############
 
-App_Data/TEMP/
+*App_Data/TEMP/*

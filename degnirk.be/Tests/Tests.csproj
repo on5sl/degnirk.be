@@ -36,7 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="cms">
-      <HintPath>..\packages\UmbracoCms.Core.7.0.1\lib\cms.dll</HintPath>
+      <HintPath>..\packages\UmbracoCms.Core.7.0.2\lib\cms.dll</HintPath>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>

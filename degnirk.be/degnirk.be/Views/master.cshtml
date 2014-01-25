@@ -1,6 +1,14 @@
-﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+﻿@using ClientDependency.Core.Mvc
+@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
 @{
     Layout = null;
+
+    Html.RequiresJs("~/scripts/jquery-2.0.3.js",0)
+        .RequiresJs("~/scripts/jquery.backstretch.js", 2)
+        .RequiresJs("~/scripts/jquery.nicescroll.js", 2)
+        .RequiresJs("~/scripts/jQueryRotate.js", 2)
+        .RequiresJs("~/scripts/bootstrap.js", 2)
+        .RequiresJs("~/scripts/DeGnirk.js", 3);
 }
 <!DOCTYPE HTML>
 <html>
@@ -17,12 +25,6 @@
         <div class="antiscroll-inner">
             @RenderSection("bodycontent")
         </div>
-        <script src="~/scripts/jquery-2.0.3.js"></script>
-        <script src="~/scripts/jquery.backstretch.js"></script>
-        <script src="~/scripts/jquery.nicescroll.js"></script>
-        <script src="~/scripts/jQueryRotate.js"></script>
-        <script src="~/scripts/bootstrap.js"></script>
-        <script src="~/scripts/DeGnirk.js"></script>
-        @RenderSection("script")
+        @Html.RenderJsHere()
     </body>
 </html>

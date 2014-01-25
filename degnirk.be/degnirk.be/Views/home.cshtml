@@ -2,9 +2,12 @@
 @using degnirk.be.Models
 @using umbraco.MacroEngines
 @using Umbraco.Web.UI.Umbraco.Create
+@using ClientDependency.Core.Mvc
 @inherits Umbraco.Web.Mvc.UmbracoTemplatePage
 @{
     Layout = "master.cshtml";
+
+    Html.RequiresJs("~/scripts/home.js",3);
     
     @helper Traverse(IPublishedContent node)
 {
@@ -190,8 +193,4 @@
         </div>
         <footer class="bottom text-center">footer</footer>
     </div>
-}
-@section script
-{
-    <script src="~/scripts/home.js"></script>
 }

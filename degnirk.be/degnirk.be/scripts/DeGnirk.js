@@ -1,23 +1,23 @@
 ﻿//$('body').niceScroll({ mousescrollstep: 20, cursorborder: '0px', cursorwidth: '7px', cursoropacitymax: 0.5 });
 
-$('document').ready(function () {
-    var calendar = $('#calendar').calendar({
-        events_source: [
-            {
-                "id": 293,
-                "title": "Event 1",
-                "url": "http://example.com",
-                "class": "event-important",
-                "start": 12039485678000, // Milliseconds
-                "end": 1234576967000 // Milliseconds
-            }
-        ],
-        language: 'nl-NL',
-        view: 'month',
-        tmpl_cache: false,
-        day: '2013-03-12'
-    });
-});
+//$('document').ready(function () {
+//    var calendar = $('#calendar').calendar({
+//        events_source: [
+//            {
+//                "id": 293,
+//                "title": "Event 1",
+//                "url": "http://example.com",
+//                "class": "event-important",
+//                "start": 12039485678000, // Milliseconds
+//                "end": 1234576967000 // Milliseconds
+//            }
+//        ],
+//        language: 'nl-NL',
+//        view: 'month',
+//        tmpl_cache: false,
+//        day: '2013-03-12'
+//    });
+//});
 
 (function (i, s, o, g, r, a, m) {
     i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {

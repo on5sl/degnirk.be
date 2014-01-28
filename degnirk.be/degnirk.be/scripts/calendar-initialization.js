@@ -1,18 +1,10 @@
 $('document').ready(function () {
     var options = {
-        events_source: [
-            {
-                "id": 293,
-                "title": "Event 1",
-                "url": "http://example.com",
-                "class": "event-important",
-                "start": 12039485678000, // Milliseconds
-                "end": 1234576967000 // Milliseconds
-            }
-        ],
+        events_source: events,
         language: 'nl-NL',
         tmpl_path: '../Content/',
         tmpl_cache: false,
+        day: '2013-03-12',
         onAfterViewLoad: function (view) {
             $('.page-header h3').text(this.getTitle());
             $('.btn-group button').removeClass('active');

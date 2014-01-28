@@ -3,12 +3,6 @@
 @inherits Umbraco.Web.Mvc.UmbracoTemplatePage
 @{
     Layout = "content.cshtml";
-
-    Html.RequiresJs("~/scripts/underscore-min.js", 2)
-        .RequiresJs("~/scripts/language/nl-NL.js", 2)
-        .RequiresJs("~/scripts/jstz.js", 2)
-        .RequiresJs("~/scripts/calendar.js", 2)
-        .RequiresJs("~/scripts/calendar-initialization.js", 3);
 }
 
 @section innercontent{
@@ -32,7 +26,7 @@
                     <button data-calendar-view="day" class="btn btn-warning">Day</button>
                 </div>
             </div>
-            <div id="calendar"></div>
+            @{ Html.RenderPartial("~/Views/Partials/Calendar.cshtml", new CalendarModel()); }
         </div>
         <div class="col-sm-12 col-lg-4">
             <h3>Laatste foto's</h3>

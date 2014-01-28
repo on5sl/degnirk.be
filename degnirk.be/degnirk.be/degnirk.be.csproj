@@ -239,6 +239,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\ExpandoHelper.cs" />
+    <Compile Include="Models\CalendarModel.cs" />
     <Compile Include="Models\FacebookAlbumsModel.cs" />
     <Compile Include="Models\FacebookEventsModel.cs" />
     <Compile Include="Models\HomeModel.cs" />
@@ -304,7 +305,7 @@
     <Content Include="images\tick.png" />
     <Content Include="masterpages\dummy.txt" />
     <Content Include="media\dummy.txt" />
-    <Content Include="scripts\app.js" />
+    <Content Include="scripts\calendar-initialization.js" />
     <Content Include="scripts\bootstrap.js" />
     <Content Include="scripts\bootstrap.min.js" />
     <Content Include="scripts\calendar.js" />
@@ -406,6 +407,7 @@
     <Content Include="Views\rehearsel.cshtml" />
     <Content Include="Views\rental.cshtml" />
     <Content Include="xslt\Web.config" />
+    <Content Include="Views\Partials\Calendar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

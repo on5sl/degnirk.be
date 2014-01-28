@@ -1,0 +1,14 @@
+﻿@using ClientDependency.Core.Mvc
+@using degnirk.be.Models
+
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<CalendarModel>
+
+@{
+    Html.RequiresJs("~/scripts/underscore-min.js", 2)
+        .RequiresJs("~/scripts/language/nl-NL.js", 2)
+        .RequiresJs("~/scripts/jstz.js", 2)
+        .RequiresJs("~/scripts/calendar.js", 2)
+        .RequiresJs("~/scripts/calendar-initialization.js", 3);
+}
+
+<div id="calendar"></div>

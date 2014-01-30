@@ -41,10 +41,22 @@ namespace degnirk.be.Models
                     {"id", fbevent.eid},
                     {"title", fbevent.name},
                     {"url", "hyperlink"},
-                    {"class", "event-important"},
-                    {"start", 1362938400000},
-                    {"end", 1362938400000}
+                    {"class", "event-info"},
+                    {"start", UnixTime(DateTime.Parse(fbevent.start_time))},
+                    {"end", UnixTime(DateTime.Parse(fbevent.start_time))}
                 }));
+        }
+
+        //TODO: Put this in a helper method
+        /// <summary>
+        /// Return the Unix time in milliseconds
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        private static long UnixTime(DateTime dateTime)
+        {
+            var timeSpan = (dateTime - new DateTime(1970, 1, 1, 0, 0, 0));
+            return (long)timeSpan.TotalMilliseconds;
         }
     }
 }

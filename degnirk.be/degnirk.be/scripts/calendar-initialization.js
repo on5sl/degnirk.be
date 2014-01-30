@@ -4,7 +4,6 @@ $('document').ready(function () {
         language: 'nl-NL',
         tmpl_path: '../Content/',
         tmpl_cache: false,
-        day: '2013-03-12',
         onAfterViewLoad: function (view) {
             $('.page-header h3').text(this.getTitle());
             $('.btn-group button').removeClass('active');

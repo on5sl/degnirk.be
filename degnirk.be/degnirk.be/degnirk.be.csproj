@@ -380,6 +380,7 @@
     <Content Include="scripts\language\ru-RU.js" />
     <Content Include="scripts\language\sv-SE.js" />
     <Content Include="scripts\language\template.js" />
+    <Content Include="scripts\login.js" />
     <Content Include="scripts\underscore-min.js" />
     <Content Include="usercontrols\dummy.txt" />
     <Content Include="Web.config">

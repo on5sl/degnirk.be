@@ -1,7 +1,11 @@
 ﻿@using ClientDependency.Core.Mvc
+@using degnirk.be.Controllers
 @using degnirk.be.Models
 
-@inherits Umbraco.Web.Mvc.UmbracoViewPage<CalendarModel>
+@using (Html.BeginUmbracoForm<CalendarController>("GetEvents"))
+{
+
+}
 
 @{
     Html.RequiresJs("~/scripts/underscore-min.js", 2)
@@ -11,8 +15,5 @@
         .RequiresJs("~/scripts/calendar-initialization.js", 3);
 }
 
+<h4 class="calendar-header">Kalender titel</h4>
 <div id="calendar"></div>
-
-<script>
-    var events = @Html.Raw(Model.FacebookEvents)
-</script>

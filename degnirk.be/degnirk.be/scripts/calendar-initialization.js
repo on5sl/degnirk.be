@@ -1,11 +1,11 @@
 $('document').ready(function () {
     var options = {
-        events_source: events,
+        events_source: '/umbraco/Surface/Calendar/GetEvents',
         language: 'nl-NL',
         tmpl_path: '../Content/',
         tmpl_cache: false,
         onAfterViewLoad: function (view) {
-            $('.page-header h3').text(this.getTitle());
+            $('h4.calendar-header').text(this.getTitle());
             $('.btn-group button').removeClass('active');
             $('button[data-calendar-view="' + view + '"]').addClass('active');
         },

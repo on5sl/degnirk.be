@@ -40,7 +40,7 @@ namespace degnirk.be.Models
                 {
                     {"id", fbevent.eid},
                     {"title", fbevent.name},
-                    {"url", "hyperlink"},
+                    {"url", EventUri + fbevent.eid},
                     {"class", "event-info"},
                     {"start", UnixTime(DateTime.Parse(fbevent.start_time))},
                     {"end", UnixTime(DateTime.Parse(fbevent.start_time))}

@@ -9,6 +9,11 @@
         .RequiresJs("~/scripts/jQueryRotate.js", 2)
         .RequiresJs("~/scripts/bootstrap.js", 2)
         .RequiresJs("~/scripts/DeGnirk.js", 3);
+
+    Html.RequiresCss("~/css/degnirk.css")
+        .RequiresCss("~/Content/bootstrap.css")
+        .RequiresCss("~/css/calendar.css");
+        @*.RequiresCss("~/Content/bootstrap-theme.css")*@
 }
 <!DOCTYPE html>
 <html>
@@ -16,10 +21,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>De Gnirk</title>
-    <link href="~/css/degnirk.css" rel="stylesheet" type="text/css" />
-    <link href="~/Content/bootstrap.css" rel="stylesheet" type="text/css" />
-    <link href="~/css/calendar.css" rel="stylesheet" type="text/css" />
-    @*<link href="~/Content/bootstrap-theme.css" rel="stylesheet" type="text/css"/>*@
+    @Html.RenderCssHere()
 </head>
 <body class="antiscroll-wrap">
     <div id="fb-root"></div>

@@ -19,8 +19,10 @@ namespace degnirk.be.Controllers
 
         public ActionResult GetEvents(long from, long to, string browser_timezone)
         {
+            var dateTimeFrom = UnixTime(from);
+            var dateTimeTo = UnixTime(to);
             _facebookClient = new FacebookClient(AccessToken);
-            GetFacebookEvents(UnixTime(from), UnixTime(to));
+            GetFacebookEvents(dateTimeFrom, dateTimeTo);
             dynamic test = new
             {
                 success = 1,
@@ -47,17 +49,22 @@ namespace degnirk.be.Controllers
             {
                 return;
             }
-            this.FacebookEvents = new List<dynamic>();
-            (facebookEvents as IEnumerable<dynamic>).OrderBy(fbevent => fbevent.start_time)
-                .ForEach(fbevent => this.FacebookEvents.Add(new
-                {
-                    id =  fbevent.eid,
-                    title = fbevent.name,
-                    url= EventUri + fbevent.eid,
-                    @class= "event-info",
-                    start= UnixTime(DateTime.Parse(fbevent.start_time)),
-                    end= UnixTime(DateTime.Parse(fbevent.start_time))
-                }));
+            this.FacebookEvents = ConvertEvents(facebookEvents as IEnumerable<dynamic>);
+        }
+
+        private static List<dynamic> ConvertEvents(IEnumerable<dynamic> events)
+        {
+            var convertedEvents = new List<dynamic>();
+            events.ForEach(fbevent => convertedEvents.Add(new
+            {
+                id = fbevent.eid,
+                title = fbevent.name,
+                url = EventUri + fbevent.eid,
+                @class = "event-info",
+                start = UnixTime(DateTime.Parse(fbevent.start_time)),
+                end = UnixTime(DateTime.Parse(fbevent.start_time))
+            }));
+            return convertedEvents;
         }
 
         //TODO: Put this in a helper method

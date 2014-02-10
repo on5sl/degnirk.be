@@ -1,6 +1,6 @@
-/*! umbraco - v7.0.0-Beta - 2013-12-13
+/*! umbraco - v7.0.0-Beta - 2014-02-03
  * https://github.com/umbraco/umbraco-cms/tree/7.0.0
- * Copyright (c) 2013 Umbraco HQ;
+ * Copyright (c) 2014 Umbraco HQ;
  * Licensed MIT
  */
 
@@ -499,7 +499,7 @@ angular.module('umbraco.services').factory("editorState", function() {
  * </pre>  
  */
 angular.module('umbraco.services')
-.factory('assetsService', function ($q, $log, angularHelper, umbRequestHelper, $rootScope) {
+.factory('assetsService', function ($q, $log, angularHelper, umbRequestHelper, $rootScope, $http) {
 
     var initAssetsLoaded = false;
 
@@ -1447,7 +1447,7 @@ function eventsService($q, $rootScope) {
 		    return $rootScope.$on(name, callback);
 		},
 		
-        /** pass in the result of subscribe to this method, or just call the method returned from subscribe to unsubscribe */
+        /** pass in the result of 'on' to this method, or just call the method returned from 'on' to unsubscribe */
 		unsubscribe: function(handle) {
 		    if (angular.isFunction(handle)) {
 		        handle();
@@ -2125,189 +2125,6 @@ function iconHelper($q, $timeout) {
     };
 }
 angular.module('umbraco.services').factory('iconHelper', iconHelper);
-/**
-* @ngdoc service
-* @name umbraco.services.imageHelper
-* @description A helper object used for parsing image paths
-**/
-function imageHelper(umbRequestHelper) {
-    return {
-        /**
-         * @ngdoc function
-         * @name umbraco.services.imageHelper#getImagePropertyValue
-         * @methodOf umbraco.services.imageHelper
-         * @function    
-         *
-         * @description
-         * Returns the actual image path associated with the image property if there is one
-         * 
-         * @param {object} options Options object
-         * @param {object} options.imageModel The media object to retrieve the image path from
-         */
-        getImagePropertyValue: function (options) {
-            if (!options && !options.imageModel) {
-                throw "The options objet does not contain the required parameters: imageModel";
-            }
-
-
-            //combine all props, TODO: we really need a better way then this
-            var props = [];
-            if (options.imageModel.properties) {
-                props = options.imageModel.properties;
-            } else {
-                $(options.imageModel.tabs).each(function (i, tab) {
-                    props = props.concat(tab.properties);
-                });
-            }
-
-            var mediaRoot = Umbraco.Sys.ServerVariables.umbracoSettings.mediaPath;
-            var imageProp = _.find(props, function (item) {
-                if (item.alias === "umbracoFile") {
-                    return true;
-                }
-
-                //this performs a simple check to see if we have a media file as value
-                //it doesnt catch everything, but better then nothing
-                if (item.value.indexOf(mediaRoot) === 0) {
-                    return true;
-                }
-
-                return false;
-            });
-
-            if (!imageProp) {
-                return "";
-            }
-
-            var imageVal;
-
-            //our default images might store one or many images (as csv)
-            var split = imageProp.value.split(',');
-            var self = this;
-            imageVal = _.map(split, function (item) {
-                return { file: item, isImage: self.detectIfImageByExtension(item) };
-            });
-
-            //for now we'll just return the first image in the collection.
-            //TODO: we should enable returning many to be displayed in the picker if the uploader supports many.
-            if (imageVal.length && imageVal.length > 0 && imageVal[0].isImage) {
-                return imageVal[0].file;
-            }
-
-            return "";
-        },
-        /**
-         * @ngdoc function
-         * @name umbraco.services.imageHelper#getThumbnail
-         * @methodOf umbraco.services.imageHelper
-         * @function    
-         *
-         * @description
-         * formats the display model used to display the content to the model used to save the content
-         * 
-         * @param {object} options Options object
-         * @param {object} options.imageModel The media object to retrieve the image path from
-         */
-        getThumbnail: function (options) {
-
-            if (!options && !options.imageModel) {
-                throw "The options objet does not contain the required parameters: imageModel";
-            }
-
-            var imagePropVal = this.getImagePropertyValue(options);
-            if (imagePropVal !== "") {
-                return this.getThumbnailFromPath(imagePropVal);
-            }
-            return "";
-        },
-
-        /**
-         * @ngdoc function
-         * @name umbraco.services.imageHelper#scaleToMaxSize
-         * @methodOf umbraco.services.imageHelper
-         * @function    
-         *
-         * @description
-         * Finds the corrct max width and max height, given maximum dimensions and keeping aspect ratios
-         * 
-         * @param {number} maxSize Maximum width & height
-         * @param {number} width Current width
-         * @param {number} height Current height
-         */
-        scaleToMaxSize: function (maxSize, width, height) {
-            var retval = { width: width, height: height };
-
-            var maxWidth = maxSize; // Max width for the image
-            var maxHeight = maxSize;    // Max height for the image
-            var ratio = 0;  // Used for aspect ratio
-
-            // Check if the current width is larger than the max
-            if (width > maxWidth) {
-                ratio = maxWidth / width;   // get ratio for scaling image
-
-                retval.width = maxWidth;
-                retval.height = height * ratio;
-
-                height = height * ratio;    // Reset height to match scaled image
-                width = width * ratio;    // Reset width to match scaled image
-            }
-
-            // Check if current height is larger than max
-            if (height > maxHeight) {
-                ratio = maxHeight / height; // get ratio for scaling image
-
-                retval.height = maxHeight;
-                retval.width = width * ratio;
-                width = width * ratio;    // Reset width to match scaled image
-            }
-
-            return retval;
-        },
-
-        /**
-         * @ngdoc function
-         * @name umbraco.services.imageHelper#getThumbnailFromPath
-         * @methodOf umbraco.services.imageHelper
-         * @function    
-         *
-         * @description
-         * Returns the path to the thumbnail version of a given media library image path
-         * 
-         * @param {string} imagePath Image path, ex: /media/1234/my-image.jpg
-         */
-        getThumbnailFromPath: function (imagePath) {
-            
-            //get the proxy url for big thumbnails (this ensures one is always generated)
-            var thumbnailUrl = umbRequestHelper.getApiUrl(
-                "imagesApiBaseUrl",
-                "GetBigThumbnail",
-                [{ originalImagePath: imagePath }]);
-
-            //var ext = imagePath.substr(imagePath.lastIndexOf('.'));
-            //return imagePath.substr(0, imagePath.lastIndexOf('.')) + "_big-thumb" + ".jpg";
-
-            return thumbnailUrl;
-        },
-
-        /**
-         * @ngdoc function
-         * @name umbraco.services.imageHelper#detectIfImageByExtension
-         * @methodOf umbraco.services.imageHelper
-         * @function    
-         *
-         * @description
-         * Returns true/false, indicating if the given path has an allowed image extension
-         * 
-         * @param {string} imagePath Image path, ex: /media/1234/my-image.jpg
-         */
-        detectIfImageByExtension: function (imagePath) {
-            var lowered = imagePath.toLowerCase();
-            var ext = lowered.substr(lowered.lastIndexOf(".") + 1);
-            return ("," + Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes + ",").indexOf("," + ext + ",") !== -1;
-        }
-    };
-}
-angular.module('umbraco.services').factory('imageHelper', imageHelper);
 // This service was based on OpenJS library available in BSD License
 // http://www.openjs.com/scripts/events/keyboard_shortcuts/index.php
 angular.module('umbraco.services')
@@ -2713,7 +2530,7 @@ function macroService() {
         /** parses the special macro syntax like <?UMBRACO_MACRO macroAlias="Map" /> and returns an object with the macro alias and it's parameters */
         parseMacroSyntax: function (syntax) {
 
-            var expression = /(<\?UMBRACO_MACRO macroAlias=["'](\w+?)["'].+?)(\/>|>.*?<\/\?UMBRACO_MACRO>)/im;
+            var expression = /(<\?UMBRACO_MACRO macroAlias=["']([\w\.]+?)["'].+?)(\/>|>.*?<\/\?UMBRACO_MACRO>)/im;
             var match = expression.exec(syntax);
             if (!match || match.length < 3) {
                 return null;
@@ -2755,7 +2572,21 @@ function macroService() {
             if (args.marcoParamsDictionary) {
 
                 _.each(args.marcoParamsDictionary, function (val, key) {
-                    var keyVal = key + "=\"" + (val ? val : "") + "\" ";
+                    //check for null
+                    val = val ? val : "";
+                    //need to detect if the val is a string or an object
+                    var keyVal;
+                    if (angular.isString(val)) {
+                        keyVal = key + "=\"" + (val ? val : "") + "\" ";
+                    }
+                    else {
+                        //if it's not a string we'll send it through the json serializer
+                        var json = angular.toJson(val);
+                        //then we need to url encode it so that it's safe
+                        var encoded = encodeURIComponent(json);
+                        keyVal = key + "=\"" + encoded + "\" ";
+                    }
+                    
                     macroString += keyVal;
                 });
 
@@ -2843,6 +2674,285 @@ function macroService() {
 }
 
 angular.module('umbraco.services').factory('macroService', macroService);
+/**
+* @ngdoc service
+* @name umbraco.services.mediaHelper
+* @description A helper object used for dealing with media items
+**/
+function mediaHelper(umbRequestHelper) {
+    return {
+        /**
+         * @ngdoc function
+         * @name umbraco.services.mediaHelper#getImagePropertyValue
+         * @methodOf umbraco.services.mediaHelper
+         * @function    
+         *
+         * @description
+         * Returns the file path associated with the media property if there is one
+         * 
+         * @param {object} options Options object
+         * @param {object} options.mediaModel The media object to retrieve the image path from
+         * @param {object} options.imageOnly Optional, if true then will only return a path if the media item is an image
+         */
+        getMediaPropertyValue: function (options) {
+            if (!options || !options.mediaModel) {
+                throw "The options objet does not contain the required parameters: mediaModel";
+            }
+
+            //combine all props, TODO: we really need a better way then this
+            var props = [];
+            if (options.mediaModel.properties) {
+                props = options.mediaModel.properties;
+            } else {
+                $(options.mediaModel.tabs).each(function (i, tab) {
+                    props = props.concat(tab.properties);
+                });
+            }
+
+            var mediaRoot = Umbraco.Sys.ServerVariables.umbracoSettings.mediaPath;
+            var imageProp = _.find(props, function (item) {
+                if (item.alias === "umbracoFile") {
+                    return true;
+                }
+
+                //this performs a simple check to see if we have a media file as value
+                //it doesnt catch everything, but better then nothing
+                if (item.value.indexOf(mediaRoot) === 0) {
+                    return true;
+                }
+
+                return false;
+            });
+
+            if (!imageProp) {
+                return "";
+            }
+
+            var mediaVal;
+
+            //our default images might store one or many images (as csv)
+            var split = imageProp.value.split(',');
+            var self = this;
+            mediaVal = _.map(split, function (item) {
+                return { file: item, isImage: self.detectIfImageByExtension(item) };
+            });
+
+            //for now we'll just return the first image in the collection.
+            //TODO: we should enable returning many to be displayed in the picker if the uploader supports many.
+            if (mediaVal.length && mediaVal.length > 0) {
+                if (!options.imageOnly || (options.imageOnly === true && mediaVal[0].isImage)) {
+                    return mediaVal[0].file;
+                }
+            }
+
+            return "";
+        },
+        
+        /**
+         * @ngdoc function
+         * @name umbraco.services.mediaHelper#getImagePropertyValue
+         * @methodOf umbraco.services.mediaHelper
+         * @function    
+         *
+         * @description
+         * Returns the actual image path associated with the image property if there is one
+         * 
+         * @param {object} options Options object
+         * @param {object} options.imageModel The media object to retrieve the image path from
+         */
+        getImagePropertyValue: function (options) {
+            if (!options || (!options.imageModel && !options.mediaModel)) {
+                throw "The options objet does not contain the required parameters: imageModel";
+            }
+
+            //required to support backwards compatibility.
+            options.mediaModel = options.imageModel ? options.imageModel : options.mediaModel;
+
+            options.imageOnly = true;
+
+            return this.getMediaPropertyValue(options);
+        },
+        /**
+         * @ngdoc function
+         * @name umbraco.services.mediaHelper#getThumbnail
+         * @methodOf umbraco.services.mediaHelper
+         * @function    
+         *
+         * @description
+         * formats the display model used to display the content to the model used to save the content
+         * 
+         * @param {object} options Options object
+         * @param {object} options.imageModel The media object to retrieve the image path from
+         */
+        getThumbnail: function (options) {
+
+            if (!options || !options.imageModel) {
+                throw "The options objet does not contain the required parameters: imageModel";
+            }
+
+            var imagePropVal = this.getImagePropertyValue(options);
+            if (imagePropVal !== "") {
+                return this.getThumbnailFromPath(imagePropVal);
+            }
+            return "";
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.mediaHelper#scaleToMaxSize
+         * @methodOf umbraco.services.mediaHelper
+         * @function    
+         *
+         * @description
+         * Finds the corrct max width and max height, given maximum dimensions and keeping aspect ratios
+         * 
+         * @param {number} maxSize Maximum width & height
+         * @param {number} width Current width
+         * @param {number} height Current height
+         */
+        scaleToMaxSize: function (maxSize, width, height) {
+            var retval = { width: width, height: height };
+
+            var maxWidth = maxSize; // Max width for the image
+            var maxHeight = maxSize;    // Max height for the image
+            var ratio = 0;  // Used for aspect ratio
+
+            // Check if the current width is larger than the max
+            if (width > maxWidth) {
+                ratio = maxWidth / width;   // get ratio for scaling image
+
+                retval.width = maxWidth;
+                retval.height = height * ratio;
+
+                height = height * ratio;    // Reset height to match scaled image
+                width = width * ratio;    // Reset width to match scaled image
+            }
+
+            // Check if current height is larger than max
+            if (height > maxHeight) {
+                ratio = maxHeight / height; // get ratio for scaling image
+
+                retval.height = maxHeight;
+                retval.width = width * ratio;
+                width = width * ratio;    // Reset width to match scaled image
+            }
+
+            return retval;
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.mediaHelper#getThumbnailFromPath
+         * @methodOf umbraco.services.mediaHelper
+         * @function    
+         *
+         * @description
+         * Returns the path to the thumbnail version of a given media library image path
+         * 
+         * @param {string} imagePath Image path, ex: /media/1234/my-image.jpg
+         */
+        getThumbnailFromPath: function (imagePath) {
+
+            //get the proxy url for big thumbnails (this ensures one is always generated)
+            var thumbnailUrl = umbRequestHelper.getApiUrl(
+                "imagesApiBaseUrl",
+                "GetBigThumbnail",
+                [{ originalImagePath: imagePath }]);
+
+            //var ext = imagePath.substr(imagePath.lastIndexOf('.'));
+            //return imagePath.substr(0, imagePath.lastIndexOf('.')) + "_big-thumb" + ".jpg";
+
+            return thumbnailUrl;
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.mediaHelper#detectIfImageByExtension
+         * @methodOf umbraco.services.mediaHelper
+         * @function    
+         *
+         * @description
+         * Returns true/false, indicating if the given path has an allowed image extension
+         * 
+         * @param {string} imagePath Image path, ex: /media/1234/my-image.jpg
+         */
+        detectIfImageByExtension: function (imagePath) {
+            var lowered = imagePath.toLowerCase();
+            var ext = lowered.substr(lowered.lastIndexOf(".") + 1);
+            return ("," + Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes + ",").indexOf("," + ext + ",") !== -1;
+        }
+    };
+}
+angular.module('umbraco.services').factory('mediaHelper', mediaHelper);
+
+/**
+* @ngdoc service
+* @name umbraco.services.imageHelper
+* @deprecated
+**/
+function imageHelper(umbRequestHelper, mediaHelper) {
+    return {
+        /**
+         * @ngdoc function
+         * @name umbraco.services.imageHelper#getImagePropertyValue
+         * @methodOf umbraco.services.imageHelper
+         * @function    
+         *
+         * @deprecated
+         */
+        getImagePropertyValue: function (options) {
+            return mediaHelper.getImagePropertyValue(options);
+        },
+        /**
+         * @ngdoc function
+         * @name umbraco.services.imageHelper#getThumbnail
+         * @methodOf umbraco.services.imageHelper
+         * @function    
+         *
+         * @deprecated
+         */
+        getThumbnail: function (options) {
+            return mediaHelper.getThumbnail(options);
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.imageHelper#scaleToMaxSize
+         * @methodOf umbraco.services.imageHelper
+         * @function    
+         *
+         * @deprecated
+         */
+        scaleToMaxSize: function (maxSize, width, height) {
+            return mediaHelper.scaleToMaxSize(maxSize, width, height);
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.imageHelper#getThumbnailFromPath
+         * @methodOf umbraco.services.imageHelper
+         * @function    
+         *
+         * @deprecated
+         */
+        getThumbnailFromPath: function (imagePath) {
+            return mediaHelper.getThumbnailFromPath(imagePath);
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.imageHelper#detectIfImageByExtension
+         * @methodOf umbraco.services.imageHelper
+         * @function    
+         *
+         * @deprecated
+         */
+        detectIfImageByExtension: function (imagePath) {
+            return mediaHelper.detectIfImageByExtension(imagePath);
+        }
+    };
+}
+angular.module('umbraco.services').factory('imageHelper', imageHelper);
 /**
  * @ngdoc service
  * @name umbraco.services.umbracoMenuActions
@@ -4468,7 +4578,7 @@ angular.module('umbraco.services').factory('serverValidationManager', serverVali
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
-function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macroResource, macroService, $routeParams, umbRequestHelper) {
+function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macroResource, macroService, $routeParams, umbRequestHelper, angularHelper) {
     return {
 
         /**
@@ -4697,7 +4807,9 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
 
                 var contentId = $routeParams.id;
 
-                macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.marcoParamsDictionary)
+                //need to wrap in safe apply since this might be occuring outside of angular
+                angularHelper.safeApply($scope, function() {
+                    macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.marcoParamsDictionary)
                     .then(function (htmlResult) {
 
                         $macroDiv.removeClass("loading");
@@ -4706,6 +4818,8 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                             $ins.html(htmlResult);
                         }
                     });
+                });
+                
             }
             
             /** Adds the button instance */
@@ -6294,6 +6408,27 @@ angular.module('umbraco.services')
 });
 
 /*Contains multiple services for various helper tasks */
+
+function packageHelper(assetsService, treeService, eventsService) {
+
+    return {
+
+        /** Called when a package is installed, this resets a bunch of data and ensures the new package assets are loaded in */
+        packageInstalled: function () {
+            //assetsService._reloadApplicationAssets().then(function() {
+            //    treeService.clearCache();
+            //    //send event
+            //    //eventsService.emit("app.reInitialize");
+
+            //    //TODO: This doesn't work and will end in an infinite browser load loop, we can't really 
+            //    // re-bootstrap anyways since that would be the same as loading the whole browser window.
+            //    //angular.bootstrap(document, ['umbraco']);
+            //});
+        }
+
+    };
+}
+angular.module('umbraco.services').factory('packageHelper', packageHelper);
 
 function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, umbRequestHelper) {
     return {

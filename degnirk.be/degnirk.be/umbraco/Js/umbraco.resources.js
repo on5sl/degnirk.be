@@ -1,6 +1,6 @@
-/*! umbraco - v7.0.0-Beta - 2013-12-13
+/*! umbraco - v7.0.0-Beta - 2014-02-03
  * https://github.com/umbraco/umbraco-cms/tree/7.0.0
- * Copyright (c) 2013 Umbraco HQ;
+ * Copyright (c) 2014 Umbraco HQ;
  * Licensed MIT
  */
 
@@ -1179,6 +1179,16 @@ function entityResource($q, $http, umbRequestHelper) {
                'Failed to retreive entity data for id ' + id);
         },
         
+        getByQuery: function (query, nodeContextId, type) {            
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "entityApiBaseUrl",
+                       "GetByQuery",
+                       [{query: query},{ nodeContextId: nodeContextId}, {type: type }])),
+               'Failed to retreive entity data for query ' + query);
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.entityResource#getByIds
@@ -1570,7 +1580,17 @@ function macroResource($q, $http, umbRequestHelper) {
             var query = "macroAlias=" + macroAlias + "&pageId=" + pageId;
             if (macroParamDictionary) {
                 var counter = 0;
-                _.each(macroParamDictionary, function(val, key) {
+                _.each(macroParamDictionary, function (val, key) {
+                    //check for null
+                    val = val ? val : "";
+                    //need to detect if the val is a string or an object
+                    if (!angular.isString(val)) {
+                        //if it's not a string we'll send it through the json serializer
+                        var json = angular.toJson(val);
+                        //then we need to url encode it so that it's safe
+                        val = encodeURIComponent(json);
+                    }                    
+
                     query += "&macroParams[" + counter + "].key=" + key + "&macroParams[" + counter + "].value=" + val;
                     counter++;
                 });

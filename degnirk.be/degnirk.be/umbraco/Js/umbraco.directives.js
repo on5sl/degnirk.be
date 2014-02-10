@@ -1,6 +1,6 @@
-/*! umbraco - v7.0.0-Beta - 2013-12-13
+/*! umbraco - v7.0.0-Beta - 2014-02-03
  * https://github.com/umbraco/umbraco-cms/tree/7.0.0
- * Copyright (c) 2013 Umbraco HQ;
+ * Copyright (c) 2014 Umbraco HQ;
  * Licensed MIT
  */
 
@@ -602,15 +602,14 @@ angular.module("umbraco.directives.html")
                             var fixedRowWidth = Math.max(element.width(), minWidth);
 
                             scope.containerStyle = { width: fixedRowWidth + "px" };
-
                             scope.rows = umbPhotoFolderHelper.buildGrid(photos, fixedRowWidth, maxHeight, startingIndex, minHeight, idealImgPerRow, margin);
 
                             if (attrs.filterBy) {
                                 scope.$watch(attrs.filterBy, function(newVal, oldVal) {
-                                    if (newVal !== oldVal) {
+                                    if (newVal && newVal !== oldVal) {
                                         var p = $filter('filter')(photos, newVal, false);
                                         scope.baseline = 0;
-                                        var m = umbPhotoFolderHelper.buildGrid(p, fixedRowWidth, 400);
+                                        var m = umbPhotoFolderHelper.buildGrid(p, fixedRowWidth, maxHeight, startingIndex, minHeight, idealImgPerRow, margin);
                                         scope.rows = m;
                                     }
                                 });
@@ -1225,6 +1224,11 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			        scope.currentSection = args.value;
 			    }
 			});
+            
+			eventsService.on("app.reInitialize", function (e, args) {
+                //re-load the sections if we're re-initializing (i.e. package installed)
+			    loadSections();
+			});
 
 			//on page resize
 			window.onresize = calculateHeight;
@@ -1556,8 +1560,9 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
 
                                 //set the root as the current active tree
                                 scope.activeTree = scope.tree.root;
-                                emitEvent("treeLoaded", { tree: scope.tree.root });
-
+                                emitEvent("treeLoaded", { tree: scope.tree });
+                                emitEvent("treeNodeExpanded", { tree: scope.tree, node: scope.tree.root, children: scope.tree.root.children });
+                           
                             }, function(reason) {
                                 scope.loading = false;
                                 notificationsService.error("Tree Error", reason);

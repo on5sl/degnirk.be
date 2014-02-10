@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{47860B
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleApi", "GoogleApi\GoogleApi.csproj", "{E22FD30C-B9D9-4041-9772-0438E552EEAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,6 +30,10 @@ Global
 		{7083408B-EE7B-4068-A6CC-EE474EDB8BDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7083408B-EE7B-4068-A6CC-EE474EDB8BDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7083408B-EE7B-4068-A6CC-EE474EDB8BDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E22FD30C-B9D9-4041-9772-0438E552EEAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E22FD30C-B9D9-4041-9772-0438E552EEAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E22FD30C-B9D9-4041-9772-0438E552EEAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E22FD30C-B9D9-4041-9772-0438E552EEAE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

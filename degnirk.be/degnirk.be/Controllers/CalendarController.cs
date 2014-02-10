@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Facebook;
+using Google;
 using Umbraco.Core;
 using Umbraco.Web.Mvc;
 
@@ -14,29 +15,36 @@ namespace degnirk.be.Controllers
         private const string AccessToken = "442171809217325|Q3rA6b68G7TuWYF1beRUNsLUe94";
         private const string CreatorId = "56615007038";
         private const string EventUri = "https://www.facebook.com/events/";
-        private FacebookClient _facebookClient;
         public List<dynamic> FacebookEvents { get; private set; }
 
-        [OutputCache(Duration = 3600, VaryByParam = "from;to;browser_timezone")]
+        //[OutputCache(Duration = 3600, VaryByParam = "from;to;browser_timezone")]
         public ActionResult GetEvents(long from, long to, string browser_timezone)
         {
             var dateTimeFrom = UnixTime(from);
             var dateTimeTo = UnixTime(to);
-            _facebookClient = new FacebookClient(AccessToken);
-            GetFacebookEvents(dateTimeFrom, dateTimeTo);
-            dynamic test = new
+            this.FacebookEvents = new List<dynamic>();
+            this.FacebookEvents.AddRange(GetFacebookEvents(dateTimeFrom, dateTimeTo));
+            this.FacebookEvents.AddRange(GetGoogleEvents(dateTimeFrom, dateTimeTo));
+            
+            dynamic result = new
             {
                 success = 1,
                 result = this.FacebookEvents
             };
-            return Json(test, JsonRequestBehavior.AllowGet);
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
 
-
-        private void GetFacebookEvents(DateTime from, DateTime to)
+        private static List<dynamic> GetGoogleEvents(DateTime from, DateTime to)
         {
+            var googleApi = new GoogleApi();
+            var googleEvents = googleApi.GetEvents(from, to);
+            return ConvertEvents(googleEvents);
+        }
 
-            dynamic facebookEvents = ((Facebook.JsonArray)(_facebookClient.Get("/fql",
+        private static List<dynamic> GetFacebookEvents(DateTime from, DateTime to)
+        {
+            var facebookClient = new FacebookClient(AccessToken);
+            dynamic facebookEvents = ((Facebook.JsonArray)(facebookClient.Get("/fql",
                 new
                 {
                     q = string.Format("select eid,  name, attending_count, pic_cover, start_time from event " +
@@ -46,11 +54,7 @@ namespace degnirk.be.Controllers
                                       "ORDER BY start_time desc", CreatorId, from.ToString("s"), to.ToString("s"))
                 }) as dynamic).data);
 
-            if (facebookEvents == null)
-            {
-                return;
-            }
-            this.FacebookEvents = ConvertEvents(facebookEvents as IEnumerable<dynamic>);
+            return facebookEvents == null ? new List<dynamic>() : ConvertEvents(facebookEvents as IEnumerable<dynamic>);
         }
 
         private static List<dynamic> ConvertEvents(IEnumerable<dynamic> events)
@@ -64,6 +68,21 @@ namespace degnirk.be.Controllers
                 @class = "event-info",
                 start = UnixTime(DateTime.Parse(fbevent.start_time)),
                 end = UnixTime(DateTime.Parse(fbevent.start_time))
+            }));
+            return convertedEvents;
+        }
+
+        private static List<dynamic> ConvertEvents(List<List<KeyValuePair<string, string>>> events)
+        {
+            var convertedEvents = new List<dynamic>();
+            events.ForEach(googleEvent => convertedEvents.Add(new
+            {
+                id = googleEvent.Single(i => i.Key == "id").Value,
+                title = googleEvent.Single(i => i.Key == "title").Value,
+                url = googleEvent.Single(i => i.Key == "url").Value,
+                @class = googleEvent.Single(i => i.Key == "class").Value,
+                start = googleEvent.Single(i => i.Key == "start").Value,
+                end = googleEvent.Single(i => i.Key == "end").Value
             }));
             return convertedEvents;
         }

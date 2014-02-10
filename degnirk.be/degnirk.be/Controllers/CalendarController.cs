@@ -17,6 +17,7 @@ namespace degnirk.be.Controllers
         private FacebookClient _facebookClient;
         public List<dynamic> FacebookEvents { get; private set; }
 
+        [OutputCache(Duration = 3600, VaryByParam = "from;to;browser_timezone")]
         public ActionResult GetEvents(long from, long to, string browser_timezone)
         {
             var dateTimeFrom = UnixTime(from);

@@ -1,0 +1,20 @@
+﻿@using degnirk.be.Controllers
+@model degnirk.be.Models.RentalModel
+
+@{
+
+}
+
+@using (Html.BeginUmbracoForm<RentalController>("HandleLogin"))
+{
+    <form role="form" class="form-horizontal">
+        <div class="form-group">
+            <label class="col-sm-2 control-label" for="exampleInputEmail1">Email</label>
+            <div class="col-sm-10">
+                <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+
+}

@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Web;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Calendar.v3;
+using Google.Apis.Calendar.v3.Data;
 using Google.Apis.Services;
 using Helpers;
 
@@ -21,7 +21,7 @@ namespace Service
         // See https://console.developers.google.com/project for this constant
         private const string ApplicationName = "test1";
         // See calendar.css for more styles available
-        private const string _eventWarning = "event-warning";
+        private const string EventWarning = "event-warning";
 
         private readonly List<dynamic> _events;
 
@@ -30,7 +30,7 @@ namespace Service
             _events = new List<dynamic>();
         }
 
-        public IEnumerable<dynamic> GetEvents(DateTime @from, DateTime to)
+        public IEnumerable<dynamic> GetEvents(DateTime from, DateTime to)
         {
             var task = GetGoogleEvents(from, to);
             task.Wait();
@@ -39,41 +39,56 @@ namespace Service
         }
         private async Task GetGoogleEvents(DateTime from, DateTime to)
         {
-            UserCredential userCredential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+            var userCredential = await GetUserCredential();
+            var calendarService = GetCalendarService(userCredential);
+
+            var query = calendarService.Events.List(Email);
+            query.TimeMin = from;
+            query.TimeMax = to;
+
+            var result = query.Execute();
+
+            ConvertToCalendarDto(result.Items);
+        }
+
+        private static CalendarService GetCalendarService(UserCredential userCredential)
+        {
+            return new CalendarService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = userCredential,
+                ApplicationName = ApplicationName
+            });
+        }
+
+        private static async Task<UserCredential> GetUserCredential()
+        {
+            return await GoogleWebAuthorizationBroker.AuthorizeAsync(
                 new ClientSecrets
                 {
                     ClientId = ClientIDforNativeApplication,
                     ClientSecret = ClientSecret
                 },
-                new[] { CalendarService.Scope.CalendarReadonly },
+                new[] {CalendarService.Scope.CalendarReadonly},
                 HttpUtility.UrlEncode(Email),
                 CancellationToken.None);
+        }
 
-            CalendarService calendarService = new CalendarService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = userCredential,
-                ApplicationName = ApplicationName
-            });
-
-            var query = calendarService.Events.List(Email);
-            query.TimeMin = from;
-            query.TimeMax = to;
-            var result = query.Execute();
-
-            foreach (var @event in result.Items)
+        private void ConvertToCalendarDto(IEnumerable<Event> events)
+        {
+            foreach (var @event in events)
             {
                 _events.Add(new
                 {
                     id = @event.Id,
                     title = @event.Summary,
                     url = string.Empty,
-                    @class = _eventWarning,
-                    start = @event.Start.DateTime.HasValue 
-                        ? UnixTimeHelper.UnixTime(@event.Start.DateTime.Value) 
+                    @class = EventWarning,
+                    start = @event.Start.DateTime.HasValue
+                        ? UnixTimeHelper.UnixTime(@event.Start.DateTime.Value)
                         : UnixTimeHelper.UnixTime(DateTime.Parse(@event.Start.Date)),
                     end = @event.End.DateTime.HasValue
-                                ? UnixTimeHelper.UnixTime(@event.End.DateTime.Value) 
-                                : UnixTimeHelper.UnixTime(DateTime.Parse(@event.End.Date))
+                        ? UnixTimeHelper.UnixTime(@event.End.DateTime.Value)
+                        : UnixTimeHelper.UnixTime(DateTime.Parse(@event.End.Date))
                 });
             }
         }

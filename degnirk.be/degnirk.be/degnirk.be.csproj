@@ -424,6 +424,8 @@
     <Content Include="Views\Partials\Calendar.cshtml" />
     <Content Include="Views\Partials\Rental.cshtml" />
     <Content Include="xslt\Web.config" />
+    <Content Include="Views\news.cshtml" />
+    <Content Include="Views\newsitem.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

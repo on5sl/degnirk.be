@@ -988,7 +988,7 @@ if(!String.prototype.formatNum) {
 							case "template":
 								self._loadTemplate("modal");
 								//	also serve calendar instance to underscore template to be able to access current language strings
-								modal_body.html(self.options.templates["modal"]({"event": event, "calendar": self}))
+							    modal_body.html(self.options.templates["modal"]({ "event": event, "calendar": self }));
 								break;
 						}
 
@@ -1146,13 +1146,13 @@ if(!String.prototype.formatNum) {
 		var k = c % 4;
 		var l = (32 + 2 * e + 2 * i - h - k) % 7;
 		var m = Math.floor((a + 11 * h + 22 * l) / 451);
-		var n0 = (h + l + 7 * m + 114)
+	    var n0 = (h + l + 7 * m + 114);
 		var n = Math.floor(n0 / 31) - 1;
 		var p = n0 % 31 + 1;
 		return new Date(year, n, p + (offsetDays ? offsetDays : 0), 0, 0, 0);
 	}
 
-	$.fn.calendar = function(params) {
-		return new Calendar(params, this);
-	}
+    $.fn.calendar = function(params) {
+        return new Calendar(params, this);
+    };
 }(jQuery));

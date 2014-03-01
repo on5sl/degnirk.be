@@ -4,28 +4,35 @@
  * https://github.com/Serhioromano/bootstrap-calendar
  *
  * User: Sergey Romanov <serg4172@mail.ru>
- * Version 0.1
  */
 "use strict";
 
 Date.prototype.getWeek = function() {
 	var onejan = new Date(this.getFullYear(), 0, 1);
 	return Math.ceil((((this.getTime() - onejan.getTime()) / 86400000) + onejan.getDay() + 1) / 7);
-}
+};
 Date.prototype.getMonthFormatted = function() {
 	var month = this.getMonth() + 1;
 	return month < 10 ? '0' + month : month;
-}
+};
 Date.prototype.getDateFormatted = function() {
 	var date = this.getDate();
 	return date < 10 ? '0' + date : date;
-}
+};
 if(!String.prototype.format) {
 	String.prototype.format = function() {
 		var args = arguments;
 		return this.replace(/{(\d+)}/g, function(match, number) {
 			return typeof args[number] != 'undefined' ? args[number] : match;
 		});
+	};
+}
+if(!String.prototype.formatNum) {
+	String.prototype.formatNum = function(decimal) {
+		var r = "" + this;
+		while(r.length < decimal)
+			r = "0" + r;
+		return r;
 	};
 }
 
@@ -38,6 +45,10 @@ if(!String.prototype.format) {
 		view:               'month',
 		// Initial date. No matter month, week or day this will be a starting point. Can be 'now' or a date in format 'yyyy-mm-dd'
 		day:                'now',
+		// Day Start time and end time with time intervals. Time split 10, 15 or 30.
+		time_start:         '06:00',
+		time_end:           '22:00',
+		time_split:         '30',
 		// Source of events data. It can be one of the following:
 		// - URL to return JSON list of events in special format.
 		//   {success:1, result: [....]} or for error {success:0, error:'Something terrible happened'}
@@ -51,7 +62,7 @@ if(!String.prototype.format) {
 		// /component/bootstrap-calendar/tmpls/
 		// or absolute
 		// http://localhost/component/bootstrap-calendar/tmpls/
-		tmpl_path:          '../Content/',
+		tmpl_path:          'tmpls/',
 		tmpl_cache:         true,
 		classes:            {
 			months: {
@@ -151,6 +162,7 @@ if(!String.prototype.format) {
 		error_dateformat: 'Calendar: Wrong date format {0}. Should be either "now" or "yyyy-mm-dd"',
 		error_loadurl:    'Calendar: Event URL is not set',
 		error_where:      'Calendar: Wrong navigation direction {0}. Can be only "next" or "prev" or "today"',
+		error_timedevide: 'Calendar: Time split parameter should divide 60 without decimals. Something like 10, 15, 30',
 
 		no_events_in_day: 'No events in this day.',
 
@@ -159,7 +171,13 @@ if(!String.prototype.format) {
 		title_week:  'week {0} of {1}',
 		title_day:   '{0} {1} {2}, {3}',
 
-		week: 'Week {0}',
+		week:        'Week {0}',
+		all_day:     'All day',
+		time:        'Time',
+		events:      'Events',
+		before_time: 'Ends before timeline',
+		after_time:  'Starts after timeline',
+
 
 		m0:  'January',
 		m1:  'February',
@@ -395,8 +413,10 @@ if(!String.prototype.format) {
 			case 'month':
 				break;
 			case 'week':
+				this._calculate_hour_minutes(data);
 				break;
 			case 'day':
+				this._calculate_hour_minutes(data);
 				break;
 		}
 
@@ -406,6 +426,101 @@ if(!String.prototype.format) {
 		this.context.append(this.options.templates[this.options.view](data));
 		this._update();
 	};
+
+	Calendar.prototype._calculate_hour_minutes = function(data) {
+		var $self = this;
+		data.in_hour = 60 / parseInt(this.options.time_split);
+		data.hour_split = parseInt(this.options.time_split);
+
+		if(!/^\d+$/.exec(data.in_hour) || this.options.time_split > 30) {
+			$.error(this.locale.error_timedevide);
+		}
+
+		var time_start = this.options.time_start.split(":");
+		var time_end = this.options.time_end.split(":");
+
+		data.hours = (parseInt(time_end[0]) - parseInt(time_start[0]));
+		var lines = data.hours * data.in_hour;
+		var ms_per_line = (60000 * parseInt(this.options.time_split));
+
+		var start = new Date(this.options.position.start.getTime());
+		start.setHours(time_start[0]);
+		start.setMinutes(time_start[1]);
+		var end = new Date(this.options.position.start.getTime());
+		end.setHours(time_end[0]);
+		end.setMinutes(time_end[1]);
+
+		data.all_day = [];
+		data.by_hour = [];
+		data.after_time = [];
+		data.before_time = [];
+		$.each(data.events, function(k, e) {
+			var s = new Date(parseInt(e.start));
+			var f = new Date(parseInt(e.end));
+
+			e.start_hour = s.getHours().toString().formatNum(2) + ':' + s.getMinutes().toString().formatNum(2);
+			e.end_hour = f.getHours().toString().formatNum(2) + ':' + f.getMinutes().toString().formatNum(2);
+
+			if(e.start < start.getTime()) {
+				warn(1);
+				e.start_hour = s.getDate() + ' ' + $self.locale['ms' + s.getMonth()] + ' ' + e.start_hour;
+			}
+
+			if(e.end > end.getTime()) {
+				warn(1);
+				e.end_hour = f.getDate() + ' ' + $self.locale['ms' + f.getMonth()] + ' ' + e.end_hour;
+			}
+
+			if(e.start < start.getTime() && e.end > end.getTime()) {
+				data.all_day.push(e);
+				return;
+			}
+
+			if(e.end < start.getTime()) {
+				data.before_time.push(e);
+				return;
+			}
+
+			if(e.start > end.getTime()) {
+				data.after_time.push(e);
+				return;
+			}
+
+			var event_start = start.getTime() - e.start;
+
+			if(event_start >= 0) {
+				e.top = 0;
+			} else {
+				e.top = Math.abs(event_start) / ms_per_line;
+			}
+
+			var lines_left = lines - e.top;
+			var lines_in_event = (e.end - e.start) / ms_per_line;
+			if(event_start >= 0) {
+				lines_in_event = (e.end - start.getTime()) / ms_per_line;
+			}
+
+
+			e.lines = lines_in_event;
+			if(lines_in_event > lines_left) {
+				e.lines = lines_left;
+			}
+
+			data.by_hour.push(e);
+		});
+
+		//var d = new Date('2013-03-14 13:20:00');
+		//warn(d.getTime());
+	};
+
+	Calendar.prototype._hour = function(hour, part) {
+		var time_start = this.options.time_start.split(":");
+
+		var hour = "" + (parseInt(time_start[0]) + hour);
+		var minute = "" + (this.options.time_split * part);
+
+		return hour.formatNum(2) + ":" + minute.formatNum(2);
+	}
 
 	Calendar.prototype._week = function(event) {
 		this._loadTemplate('week-days');
@@ -568,7 +683,13 @@ if(!String.prototype.format) {
 	};
 
 	Calendar.prototype.view = function(view) {
-		if(view) this.options.view = view;
+		if(view) {
+			if(!this.options.views[view].enable) {
+				return;
+			}
+			this.options.view = view;
+		}
+
 
 		this._init_position();
 		this._loadEvents();
@@ -793,17 +914,11 @@ if(!String.prototype.format) {
 
 		$('*[data-cal-date]').click(function() {
 			var view = $(this).data('cal-view');
-			if(!self.options.views[view].enable) {
-				return;
-			}
 			self.options.day = $(this).data('cal-date');
 			self.view(view);
 		});
 		$('.cal-cell').dblclick(function() {
 			var view = $('[data-cal-date]', this).data('cal-view');
-			if(!self.options.views[view].enable) {
-				return;
-			}
 			self.options.day = $('[data-cal-date]', this).data('cal-date');
 			self.view(view);
 		});
@@ -889,6 +1004,7 @@ if(!String.prototype.format) {
 	};
 
 	Calendar.prototype._update_day = function() {
+		$('#cal-day-panel').height($('#cal-day-panel-hour').height());
 	};
 
 	Calendar.prototype._update_week = function() {
@@ -939,7 +1055,7 @@ if(!String.prototype.format) {
 		}
 		var self = this;
 		var activecell = 0;
-		var downbox = $(document.createElement('div')).attr('id', 'cal-day-box').html('<i class="icon-chevron-down glyphicon glyphicon-chevron-down"></i>');
+		var downbox = $(document.createElement('div')).attr('id', 'cal-day-tick').html('<i class="icon-chevron-down glyphicon glyphicon-chevron-down"></i>');
 
 		$('.cal-month-day, .cal-year-box .span3')
 			.on('mouseenter', function() {

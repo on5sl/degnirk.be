@@ -5,6 +5,6 @@ namespace Service
 {
     public interface IGoogleService
     {
-        List<List<KeyValuePair<string, string>>> GetEvents(DateTime from, DateTime to);
+        IEnumerable<dynamic> GetEvents(DateTime @from, DateTime to);
     }
 }

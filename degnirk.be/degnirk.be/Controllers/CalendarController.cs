@@ -37,29 +37,14 @@ namespace degnirk.be.Controllers
         private static IEnumerable<dynamic> GetGoogleEvents(DateTime from, DateTime to)
         {
             var googleService = new GoogleService();
-            var googleEvents = googleService.GetEvents(from,to);
-            return ConvertEvents(googleEvents);
+            var googleEvents = googleService.GetEvents(@from,to);
+            return googleEvents;
         }
 
         private static IEnumerable<dynamic> GetFacebookEvents(DateTime from, DateTime to)
         {
             var facebookService = new FacebookService();
             return facebookService.GetFacebookEvents(from, to);
-        }
-
-        private static IEnumerable<dynamic> ConvertEvents(List<List<KeyValuePair<string, string>>> events)
-        {
-            var convertedEvents = new List<dynamic>();
-            events.ForEach(googleEvent => convertedEvents.Add(new
-            {
-                id = googleEvent.Single(i => i.Key == "id").Value,
-                title = googleEvent.Single(i => i.Key == "title").Value,
-                url = googleEvent.Single(i => i.Key == "url").Value,
-                @class = googleEvent.Single(i => i.Key == "class").Value,
-                start = googleEvent.Single(i => i.Key == "start").Value,
-                end = googleEvent.Single(i => i.Key == "end").Value
-            }));
-            return convertedEvents;
         }
     }
 }

@@ -1,9 +1,10 @@
-﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+﻿@using degnirk.be.Models
+@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
 @{
     Layout = "content.cshtml";
 }
 
 @section innercontent
 {
-
+    @{ Html.RenderPartial("~/Views/Partials/Rental.cshtml", new RentalModel()); }
 }

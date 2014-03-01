@@ -245,6 +245,7 @@
     <Compile Include="CodeTemplates\AddView\CSHTML\SurfaceController.cs" />
     <Compile Include="Controllers\CalendarController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="Controllers\RentalController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -253,6 +254,7 @@
     <Compile Include="Models\FacebookEventsModel.cs" />
     <Compile Include="Models\HomeModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
+    <Compile Include="Models\RentalModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -420,6 +422,7 @@
     <Content Include="Views\rental.cshtml" />
     <Content Include="Views\Partials\Calendar.cshtml" />
     <Content Include="xslt\Web.config" />
+    <Content Include="Views\Partials\Rental.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

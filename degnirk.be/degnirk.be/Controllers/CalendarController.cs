@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using Facebook;
 using Google;
-using Umbraco.Core;
+using Helpers;
+using Service;
 using Umbraco.Web.Mvc;
 
 namespace degnirk.be.Controllers
@@ -20,8 +21,8 @@ namespace degnirk.be.Controllers
         //[OutputCache(Duration = 3600, VaryByParam = "from;to;browser_timezone")]
         public ActionResult GetEvents(long from, long to, string browser_timezone)
         {
-            var dateTimeFrom = UnixTime(from);
-            var dateTimeTo = UnixTime(to);
+            var dateTimeFrom = UnixTimeHelper.UnixTime(from);
+            var dateTimeTo = UnixTimeHelper.UnixTime(to);
             this.FacebookEvents = new List<dynamic>();
             this.FacebookEvents.AddRange(GetFacebookEvents(dateTimeFrom, dateTimeTo));
             this.FacebookEvents.AddRange(GetGoogleEvents(dateTimeFrom, dateTimeTo));
@@ -34,45 +35,20 @@ namespace degnirk.be.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
-        private static List<dynamic> GetGoogleEvents(DateTime from, DateTime to)
+        private static IEnumerable<dynamic> GetGoogleEvents(DateTime from, DateTime to)
         {
             var googleApi = new GoogleApi();
             var googleEvents = googleApi.GetEvents(from, to);
             return ConvertEvents(googleEvents);
         }
 
-        private static List<dynamic> GetFacebookEvents(DateTime from, DateTime to)
+        private static IEnumerable<dynamic> GetFacebookEvents(DateTime from, DateTime to)
         {
-            var facebookClient = new FacebookClient(AccessToken);
-            dynamic facebookEvents = ((Facebook.JsonArray)(facebookClient.Get("/fql",
-                new
-                {
-                    q = string.Format("select eid,  name, attending_count, pic_cover, start_time from event " +
-                                      "where creator = {0} " +
-                                      "AND start_time >= '{1}' " +
-                                      "AND start_time <= '{2}' " +
-                                      "ORDER BY start_time desc", CreatorId, from.ToString("s"), to.ToString("s"))
-                }) as dynamic).data);
-
-            return facebookEvents == null ? new List<dynamic>() : ConvertEvents(facebookEvents as IEnumerable<dynamic>);
+            var facebookService = new FacebookService();
+            return facebookService.GetFacebookEvents(from, to);
         }
 
-        private static List<dynamic> ConvertEvents(IEnumerable<dynamic> events)
-        {
-            var convertedEvents = new List<dynamic>();
-            events.ForEach(fbevent => convertedEvents.Add(new
-            {
-                id = fbevent.eid,
-                title = fbevent.name,
-                url = EventUri + fbevent.eid,
-                @class = "event-info",
-                start = UnixTime(DateTime.Parse(fbevent.start_time)),
-                end = UnixTime(DateTime.Parse(fbevent.start_time))
-            }));
-            return convertedEvents;
-        }
-
-        private static List<dynamic> ConvertEvents(List<List<KeyValuePair<string, string>>> events)
+        private static IEnumerable<dynamic> ConvertEvents(List<List<KeyValuePair<string, string>>> events)
         {
             var convertedEvents = new List<dynamic>();
             events.ForEach(googleEvent => convertedEvents.Add(new
@@ -85,26 +61,6 @@ namespace degnirk.be.Controllers
                 end = googleEvent.Single(i => i.Key == "end").Value
             }));
             return convertedEvents;
-        }
-
-        //TODO: Put this in a helper method
-        /// <summary>
-        /// Return the Unix time in milliseconds
-        /// </summary>
-        /// <param name="dateTime"></param>
-        /// <returns></returns>
-        private static long UnixTime(DateTime dateTime)
-        {
-            var timeSpan = (dateTime - new DateTime(1970, 1, 1, 0, 0, 0));
-            return (long)timeSpan.TotalMilliseconds;
-        }
-
-        public static DateTime UnixTime(double unixTimeStamp)
-        {
-            // Unix timestamp is seconds past epoch
-            var dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-            dtDateTime = dtDateTime.AddMilliseconds(unixTimeStamp).ToLocalTime();
-            return dtDateTime;
         }
     }
 }

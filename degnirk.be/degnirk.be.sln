@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.30219.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "degnirk.be", "degnirk.be\degnirk.be.csproj", "{1E6A046A-2CA9-4D94-97EB-76DBEFC1EFD9}"
 EndProject
@@ -15,6 +15,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{47860B
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleApi", "GoogleApi\GoogleApi.csproj", "{E22FD30C-B9D9-4041-9772-0438E552EEAE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Service", "Service", "{7B2477BA-02FB-4E2E-956C-49FAA4C0F67C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FacebookService_Test", "FacebookService_Test\FacebookService_Test.csproj", "{F94BA6B7-D190-439E-8E6C-87EE1D6E19E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FacebookService", "FacebookService\FacebookService.csproj", "{C80A57D0-ADBC-4CDF-B44C-F6BF187D999A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Helpers", "Helpers", "{810656D6-C31B-4FD4-AC97-EC49E86C72F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpers", "Helpers\Helpers.csproj", "{5D60AFF9-A38F-416E-95D9-23EA9173DE25}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,8 +44,25 @@ Global
 		{E22FD30C-B9D9-4041-9772-0438E552EEAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E22FD30C-B9D9-4041-9772-0438E552EEAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E22FD30C-B9D9-4041-9772-0438E552EEAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F94BA6B7-D190-439E-8E6C-87EE1D6E19E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F94BA6B7-D190-439E-8E6C-87EE1D6E19E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F94BA6B7-D190-439E-8E6C-87EE1D6E19E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F94BA6B7-D190-439E-8E6C-87EE1D6E19E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C80A57D0-ADBC-4CDF-B44C-F6BF187D999A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C80A57D0-ADBC-4CDF-B44C-F6BF187D999A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C80A57D0-ADBC-4CDF-B44C-F6BF187D999A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C80A57D0-ADBC-4CDF-B44C-F6BF187D999A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D60AFF9-A38F-416E-95D9-23EA9173DE25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D60AFF9-A38F-416E-95D9-23EA9173DE25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D60AFF9-A38F-416E-95D9-23EA9173DE25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D60AFF9-A38F-416E-95D9-23EA9173DE25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C80A57D0-ADBC-4CDF-B44C-F6BF187D999A} = {7B2477BA-02FB-4E2E-956C-49FAA4C0F67C}
+		{F94BA6B7-D190-439E-8E6C-87EE1D6E19E2} = {7B2477BA-02FB-4E2E-956C-49FAA4C0F67C}
+		{5D60AFF9-A38F-416E-95D9-23EA9173DE25} = {810656D6-C31B-4FD4-AC97-EC49E86C72F3}
 	EndGlobalSection
 EndGlobal

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Configuration;
 using System.Globalization;
+using System.Web.Helpers;
 using System.Web.Mvc;
-using Facebook;
+using Service;
 using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.member;
@@ -14,21 +15,18 @@ namespace degnirk.be.Controllers
 {
     public class LoginController : SurfaceController
     {
-        private const string name = "name";
-        private const string id = "id";
-        private const string email = "email";
-        private const string birthday = "birthday";
-        private const string location = "location";
-        private const string link = "link";
-        private const string lastLogin = "umbracoLastLoginPropertyTypeAlias";
+        private const string Birthday = "birthday";
+        private const string Location = "location";
+        private const string Link = "link";
+        private const string LastLogin = "umbracoLastLoginPropertyTypeAlias";
 
         public ActionResult UserInfo(string accessToken)
         {
             HttpContext.Session["AccessToken"] = accessToken;
 
-            var client = new FacebookClient(accessToken);
-            dynamic user = client.Get("me", new { fields = string.Format("{0},{1},{2},{3},{4},{5}", name, id, email, birthday, location, link) });
-
+            var facebookService = new FacebookService(accessToken);
+            var user = facebookService.GetCurrentUser();
+            
             Member member = Member.GetMemberFromEmail(user.email);
             if (member == null)
             {
@@ -37,7 +35,7 @@ namespace degnirk.be.Controllers
             }
             else
             {
-                member.getProperty(lastLogin).Value = DateTime.Now;
+                member.getProperty(LastLogin).Value = DateTime.Now;
                 member.Save();
             }
 
@@ -65,7 +63,8 @@ namespace degnirk.be.Controllers
                         user.name,
                         ParseFacebookBirthday(user),
                         DateTime.Now.AddYears(1),
-                        ((Facebook.JsonObject)user.location)["name"]),
+                        user.location["name"]
+                        ),
                     false);
             }
             catch (Exception exception)
@@ -81,9 +80,9 @@ namespace degnirk.be.Controllers
             Member member = Member.MakeNew(user.name, user.email, user.email, MemberType.GetByAlias("Member"),
                 new User(0));
             member.ChangePassword(System.Web.Security.Membership.GeneratePassword(10, 2));
-            member.getProperty(birthday).Value = ParseFacebookBirthday(user);
-            member.getProperty(location).Value = ((Facebook.JsonObject)user.location)["name"];
-            member.getProperty(link).Value = user.link;
+            member.getProperty(Birthday).Value = ParseFacebookBirthday(user);
+            member.getProperty(Location).Value = user.location["name"];
+            member.getProperty(Link).Value = user.link;
             Member.AddMemberToCache(member);
             member.Save();
 

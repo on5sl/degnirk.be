@@ -74,9 +74,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\UmbracoCms.Core.7.0.3\lib\Examine.dll</HintPath>
     </Reference>
-    <Reference Include="Facebook">
-      <HintPath>..\packages\Facebook.6.4.2\lib\net45\Facebook.dll</HintPath>
-    </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\packages\HtmlAgilityPack.1.4.6\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
@@ -252,7 +249,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\ExpandoHelper.cs" />
     <Compile Include="Models\CalendarModel.cs" />
     <Compile Include="Models\FacebookAlbumsModel.cs" />
     <Compile Include="Models\FacebookEventsModel.cs" />
@@ -430,6 +426,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Helpers\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -450,9 +447,17 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FacebookService\FacebookService.csproj">
+      <Project>{c80a57d0-adbc-4cdf-b44c-f6bf187d999a}</Project>
+      <Name>FacebookService</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GoogleApi\GoogleApi.csproj">
       <Project>{e22fd30c-b9d9-4041-9772-0438e552eeae}</Project>
       <Name>GoogleApi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Helpers\Helpers.csproj">
+      <Project>{5D60AFF9-A38F-416E-95D9-23EA9173DE25}</Project>
+      <Name>Helpers</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

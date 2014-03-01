@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Web;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Calendar.v3;
 using Google.Apis.Services;
@@ -19,14 +20,21 @@ namespace Service
 
         // See https://console.developers.google.com/project for this constant
         private const string ApplicationName = "test1";
+        // See calendar.css for more styles available
+        private const string _eventWarning = "event-warning";
 
-        private readonly List<List<KeyValuePair<string, string>>> _events = new List<List<KeyValuePair<string, string>>>();
-        //private Events _events = new Events();
+        private readonly List<dynamic> _events;
+
+        public GoogleService()
+        {
+            _events = new List<dynamic>();
+        }
+
         public IEnumerable<dynamic> GetEvents(DateTime @from, DateTime to)
         {
             var task = GetGoogleEvents(from, to);
             task.Wait();
-            return ConvertEvents(_events);
+            return _events;
 
         }
         private async Task GetGoogleEvents(DateTime from, DateTime to)
@@ -38,7 +46,7 @@ namespace Service
                     ClientSecret = ClientSecret
                 },
                 new[] { CalendarService.Scope.CalendarReadonly },
-                "jhdegnirk%40gmail.com",
+                HttpUtility.UrlEncode(Email),
                 CancellationToken.None);
 
             CalendarService calendarService = new CalendarService(new BaseClientService.Initializer()
@@ -52,37 +60,22 @@ namespace Service
             query.TimeMax = to;
             var result = query.Execute();
 
-            foreach (var item in result.Items)
+            foreach (var @event in result.Items)
             {
-                _events.Add(new List<KeyValuePair<string, string>>()
+                _events.Add(new
                 {
-                    new KeyValuePair<string, string>("id", item.Id),
-                    new KeyValuePair<string, string>("title", item.Summary),
-                    new KeyValuePair<string, string>("url", string.Empty),
-                    new KeyValuePair<string, string>("class", "event-warning"),
-                    new KeyValuePair<string, string>("start", (item.Start.DateTime.HasValue 
-                        ? UnixTimeHelper.UnixTime(item.Start.DateTime.Value) 
-                        : UnixTimeHelper.UnixTime(DateTime.Parse(item.Start.Date))).ToString()),
-                    new KeyValuePair<string, string>("end", (item.End.DateTime.HasValue 
-                        ? UnixTimeHelper.UnixTime(item.End.DateTime.Value) 
-                        : UnixTimeHelper.UnixTime(DateTime.Parse(item.End.Date))).ToString())
+                    id = @event.Id,
+                    title = @event.Summary,
+                    url = string.Empty,
+                    @class = _eventWarning,
+                    start = @event.Start.DateTime.HasValue 
+                        ? UnixTimeHelper.UnixTime(@event.Start.DateTime.Value) 
+                        : UnixTimeHelper.UnixTime(DateTime.Parse(@event.Start.Date)),
+                    end = @event.End.DateTime.HasValue
+                                ? UnixTimeHelper.UnixTime(@event.End.DateTime.Value) 
+                                : UnixTimeHelper.UnixTime(DateTime.Parse(@event.End.Date))
                 });
             }
-        }
-
-        private static IEnumerable<dynamic> ConvertEvents(List<List<KeyValuePair<string, string>>> events)
-        {
-            var convertedEvents = new List<dynamic>();
-            events.ForEach(googleEvent => convertedEvents.Add(new
-            {
-                id = googleEvent.Single(i => i.Key == "id").Value,
-                title = googleEvent.Single(i => i.Key == "title").Value,
-                url = googleEvent.Single(i => i.Key == "url").Value,
-                @class = googleEvent.Single(i => i.Key == "class").Value,
-                start = googleEvent.Single(i => i.Key == "start").Value,
-                end = googleEvent.Single(i => i.Key == "end").Value
-            }));
-            return convertedEvents;
         }
     }
 }

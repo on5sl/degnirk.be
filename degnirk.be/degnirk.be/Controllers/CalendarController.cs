@@ -4,7 +4,6 @@ using System.Dynamic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using Google;
 using Helpers;
 using Service;
 using Umbraco.Web.Mvc;
@@ -37,8 +36,8 @@ namespace degnirk.be.Controllers
 
         private static IEnumerable<dynamic> GetGoogleEvents(DateTime from, DateTime to)
         {
-            var googleApi = new GoogleApi();
-            var googleEvents = googleApi.GetEvents(from, to);
+            var googleService = new GoogleService();
+            var googleEvents = googleService.GetEvents(from,to);
             return ConvertEvents(googleEvents);
         }
 

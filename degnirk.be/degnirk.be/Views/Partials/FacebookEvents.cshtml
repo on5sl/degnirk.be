@@ -12,8 +12,8 @@
         <li class="list-group-item">
             <span class="badge">@facebookEvent.attendingCount</span>
             <p class="list-group-item-heading"><a href="@facebookEvent.link">@facebookEvent.name</a></p>
-            <a href="@facebookEvent.link">
-                <img class="img-responsive img-rounded" src="@facebookEvent.picCover" alt="@facebookEvent.name" />
+            <a class="facebook-event-img" href="@facebookEvent.link" style="background-image: url(@facebookEvent.picCover)">
+                @*<img class="img-responsive img-rounded" src="@facebookEvent.picCover" alt="@facebookEvent.name" />*@
             </a>
         </li>
     }

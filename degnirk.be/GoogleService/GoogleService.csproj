@@ -86,7 +86,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GoogleService.cs" />
+    <Compile Include="GoogleServiceSettings.cs" />
     <Compile Include="IGoogleService.cs" />
+    <Compile Include="IGoogleServiceSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

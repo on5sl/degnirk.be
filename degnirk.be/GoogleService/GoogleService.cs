@@ -13,21 +13,16 @@ namespace Service
 {
     public class GoogleService : IGoogleService
     {
-        // See https://console.developers.google.com fore more info
-        private const string ClientIDforNativeApplication = "539942760355-ndbtaf1pi3iih0o31m6sh47vh16gr8h4.apps.googleusercontent.com";
-        private const string ClientSecret = "L4XjviYSsciNU1TpvExREotB";
-        private const string Email = "jhdegnirk@gmail.com";
-
-        // See https://console.developers.google.com/project for this constant
-        private const string ApplicationName = "test1";
         // See calendar.css for more styles available
         private const string EventWarning = "event-warning";
 
+        public readonly GoogleServiceSettings GoogleServiceSettings;
         private readonly List<dynamic> _events;
 
-        public GoogleService()
+        public GoogleService(GoogleServiceSettings googleServiceSettings)
         {
             _events = new List<dynamic>();
+            this.GoogleServiceSettings = googleServiceSettings;
         }
 
         public IEnumerable<dynamic> GetEvents(DateTime from, DateTime to)
@@ -42,7 +37,7 @@ namespace Service
             var userCredential = await GetUserCredential();
             var calendarService = GetCalendarService(userCredential);
 
-            var query = calendarService.Events.List(Email);
+            var query = calendarService.Events.List(this.GoogleServiceSettings.Email);
             query.TimeMin = from;
             query.TimeMax = to;
 
@@ -51,25 +46,25 @@ namespace Service
             ConvertToCalendarDto(result.Items);
         }
 
-        private static CalendarService GetCalendarService(UserCredential userCredential)
+        private CalendarService GetCalendarService(UserCredential userCredential)
         {
             return new CalendarService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = userCredential,
-                ApplicationName = ApplicationName
+                ApplicationName = this.GoogleServiceSettings.ApplicationName
             });
         }
 
-        private static async Task<UserCredential> GetUserCredential()
+        private async Task<UserCredential> GetUserCredential()
         {
             return await GoogleWebAuthorizationBroker.AuthorizeAsync(
                 new ClientSecrets
                 {
-                    ClientId = ClientIDforNativeApplication,
-                    ClientSecret = ClientSecret
+                    ClientId = this.GoogleServiceSettings.ClientIDforNativeApplication,
+                    ClientSecret = this.GoogleServiceSettings.ClientSecret
                 },
                 new[] {CalendarService.Scope.CalendarReadonly},
-                HttpUtility.UrlEncode(Email),
+                HttpUtility.UrlEncode(this.GoogleServiceSettings.Email),
                 CancellationToken.None);
         }
 

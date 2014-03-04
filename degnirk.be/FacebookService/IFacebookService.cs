@@ -6,11 +6,11 @@ namespace Service
 {
     public interface IFacebookService
     {
-        IEnumerable<ExpandoObject> GetLatestFacebookEvents(short numberOfEvents);
+        IEnumerable<ExpandoObject> GetLatestFacebookEvents(string creatorId, short numberOfEvents);
 
-        IEnumerable<dynamic> GetFacebookEvents(DateTime from, DateTime to);
+        IEnumerable<dynamic> GetFacebookEvents(string creatorId, DateTime from, DateTime to);
 
-        IEnumerable<ExpandoObject> GetFacebookAlbums();
+        IEnumerable<ExpandoObject> GetFacebookAlbums(string creatorId);
 
         dynamic GetCurrentUser();
     }

@@ -10,29 +10,26 @@ namespace Service
 {
     public class FacebookService : IFacebookService
     {
-        private const string AccessToken = "442171809217325|Q3rA6b68G7TuWYF1beRUNsLUe94";
-        private const short NumberOfEvents = 3;
-        private const string CreatorId = "56615007038";
         private const string EventUri = "https://www.facebook.com/events/";
         private readonly FacebookClient _facebookClient;
 
-        public FacebookService(string accessToken = AccessToken)
+        public FacebookService(string accessToken)
         {
             _facebookClient = new FacebookClient(accessToken);
         }
 
-        public IEnumerable<ExpandoObject> GetLatestFacebookEvents(short numberOfEvents)
+        public IEnumerable<ExpandoObject> GetLatestFacebookEvents(string creatorId, short numberOfEvents)
         {
             dynamic facebookEvents = ((Facebook.JsonArray)(_facebookClient.Get("/fql",
                 new
                 {
-                    q = string.Format("select eid,  name, attending_count, pic_cover, start_time from event where creator = {0} ORDER BY start_time desc limit {1}", CreatorId, numberOfEvents)
+                    q = string.Format("select eid,  name, attending_count, pic_cover, start_time from event where creator = {0} ORDER BY start_time desc limit {1}", creatorId, numberOfEvents)
                 }) as dynamic).data);
 
             return facebookEvents == null ? null : ConvertEventsToDto(facebookEvents);
         }
 
-        public IEnumerable<dynamic> GetFacebookEvents(DateTime @from, DateTime to)
+        public IEnumerable<dynamic> GetFacebookEvents(string creatorId, DateTime @from, DateTime to)
         {
 
             dynamic facebookEvents = ((Facebook.JsonArray)(_facebookClient.Get("/fql",
@@ -42,7 +39,7 @@ namespace Service
                                       "where creator = {0} " +
                                       "AND start_time >= '{1}' " +
                                       "AND start_time <= '{2}' " +
-                                      "ORDER BY start_time desc", CreatorId, from.ToString("s"), to.ToString("s"))
+                                      "ORDER BY start_time desc", creatorId, from.ToString("s"), to.ToString("s"))
                 }) as dynamic).data);
 
             return ConvertEventsToCalendarDto(facebookEvents);
@@ -81,14 +78,14 @@ namespace Service
                 }.ToExpando();
         }
 
-        public IEnumerable<ExpandoObject> GetFacebookAlbums()
+        public IEnumerable<ExpandoObject> GetFacebookAlbums(string creatorId)
         {
             dynamic facebookAlbums = _facebookClient.Get("/fql",
                 new
                 {
                     q = new
                     {
-                        coverPids = string.Format("select name, link,aid, cover_pid from album where owner = {0} AND photo_count > 0 ORDER BY created desc", CreatorId),
+                        coverPids = string.Format("select name, link,aid, cover_pid from album where owner = {0} AND photo_count > 0 ORDER BY created desc", creatorId),
                         coverSrcs = "select src, src_big,aid from photo where pid in (select cover_pid from #coverPids)"
                     }
                 });

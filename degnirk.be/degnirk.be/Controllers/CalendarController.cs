@@ -15,15 +15,19 @@ namespace degnirk.be.Controllers
     {
         public List<dynamic> FacebookEvents { get; private set; }
         private readonly GoogleService _googleService;
+        private readonly FacebookService _facebookService;
 
         public CalendarController()
         {
             var googleServiceSettings = new GoogleServiceSettings(
-                ConfigurationManager.AppSettings["ClientIDforNativeApplication"], 
-                ConfigurationManager.AppSettings["ClientSecret"], 
-                ConfigurationManager.AppSettings["Email"], 
-                ConfigurationManager.AppSettings["ApplicationName"]);
+                ConfigurationManager.AppSettings["GoogleClientIDforNativeApplication"],
+                ConfigurationManager.AppSettings["GoogleClientSecret"],
+                ConfigurationManager.AppSettings["GoogleEmail"],
+                ConfigurationManager.AppSettings["GoogleApplicationName"]);
             this._googleService = new GoogleService(googleServiceSettings);
+
+            this._facebookService = new FacebookService(
+                ConfigurationManager.AppSettings["FacebookAppAccessToken"]);
         }
 
         //[OutputCache(Duration = 3600, VaryByParam = "from;to;browser_timezone")]
@@ -32,7 +36,8 @@ namespace degnirk.be.Controllers
             var dateTimeFrom = UnixTimeHelper.UnixTime(from);
             var dateTimeTo = UnixTimeHelper.UnixTime(to);
             this.FacebookEvents = new List<dynamic>();
-            this.FacebookEvents.AddRange(GetFacebookEvents(dateTimeFrom, dateTimeTo));
+            this.FacebookEvents.AddRange(
+                this._facebookService.GetFacebookEvents(ConfigurationManager.AppSettings["FacebookPageId"], dateTimeFrom, dateTimeTo));
             this.FacebookEvents.AddRange(this._googleService.GetEvents(dateTimeFrom, dateTimeTo));
             
             dynamic result = new
@@ -41,12 +46,6 @@ namespace degnirk.be.Controllers
                 result = this.FacebookEvents
             };
             return Json(result, JsonRequestBehavior.AllowGet);
-        }
-
-        private static IEnumerable<dynamic> GetFacebookEvents(DateTime from, DateTime to)
-        {
-            var facebookService = new FacebookService();
-            return facebookService.GetFacebookEvents(from, to);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Service;
+﻿using System.Configuration;
+using Service;
 
 namespace degnirk.be.Models
 {
@@ -10,8 +11,11 @@ namespace degnirk.be.Models
 
         public FacebookEventsModel()
         {
-            var facebookService = new FacebookService();
-            this.FacebookEvents = facebookService.GetLatestFacebookEvents(NumberOfEvents);
+            var facebookService = new FacebookService(
+                ConfigurationManager.AppSettings["FacebookAppAccessToken"]);
+            this.FacebookEvents = facebookService.GetLatestFacebookEvents(
+                ConfigurationManager.AppSettings["FacebookPageId"], 
+                NumberOfEvents);
         }
     }
 }

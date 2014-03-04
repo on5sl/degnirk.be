@@ -13,7 +13,6 @@ namespace degnirk.be.Controllers
 {
     public class CalendarController : SurfaceController
     {
-        public List<dynamic> FacebookEvents { get; private set; }
         private readonly GoogleService _googleService;
         private readonly FacebookService _facebookService;
 
@@ -35,15 +34,16 @@ namespace degnirk.be.Controllers
         {
             var dateTimeFrom = UnixTimeHelper.UnixTime(from);
             var dateTimeTo = UnixTimeHelper.UnixTime(to);
-            this.FacebookEvents = new List<dynamic>();
-            this.FacebookEvents.AddRange(
+            var events = new List<dynamic>();
+            events.AddRange(
                 this._facebookService.GetFacebookEvents(ConfigurationManager.AppSettings["FacebookPageId"], dateTimeFrom, dateTimeTo));
-            this.FacebookEvents.AddRange(this._googleService.GetEvents(dateTimeFrom, dateTimeTo));
+            events.AddRange(
+                this._googleService.GetEvents(dateTimeFrom, dateTimeTo));
             
             dynamic result = new
             {
                 success = 1,
-                result = this.FacebookEvents
+                result = events
             };
             return Json(result, JsonRequestBehavior.AllowGet);
         }

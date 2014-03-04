@@ -20,7 +20,7 @@ namespace Service
 
         public IEnumerable<ExpandoObject> GetLatestFacebookEvents(string creatorId, short numberOfEvents)
         {
-            dynamic facebookEvents = ((Facebook.JsonArray)(_facebookClient.Get("/fql",
+            dynamic facebookEvents = ((JsonArray)(_facebookClient.Get("/fql",
                 new
                 {
                     q = string.Format("select eid,  name, attending_count, pic_cover, start_time from event where creator = {0} ORDER BY start_time desc limit {1}", creatorId, numberOfEvents)
@@ -32,7 +32,7 @@ namespace Service
         public IEnumerable<dynamic> GetFacebookEvents(string creatorId, DateTime @from, DateTime to)
         {
 
-            dynamic facebookEvents = ((Facebook.JsonArray)(_facebookClient.Get("/fql",
+            dynamic facebookEvents = ((JsonArray)(_facebookClient.Get("/fql",
                 new
                 {
                     q = string.Format("select eid,  name, attending_count, pic_cover, start_time from event " +
@@ -89,8 +89,8 @@ namespace Service
                         coverSrcs = "select src, src_big,aid from photo where pid in (select cover_pid from #coverPids)"
                     }
                 });
-            var coverPids = ((Facebook.JsonArray)facebookAlbums.data).Cast<dynamic>().FirstOrDefault(i => i.name == "coverPids");
-            var coverSrcs = ((Facebook.JsonArray)facebookAlbums.data).Cast<dynamic>().FirstOrDefault(i => i.name == "coverSrcs");
+            var coverPids = ((JsonArray)facebookAlbums.data).Cast<dynamic>().FirstOrDefault(i => i.name == "coverPids");
+            var coverSrcs = ((JsonArray)facebookAlbums.data).Cast<dynamic>().FirstOrDefault(i => i.name == "coverSrcs");
 
             if (coverPids == null || coverSrcs == null || coverPids.fql_result_set == null || coverSrcs.fql_result_set == null)
             {

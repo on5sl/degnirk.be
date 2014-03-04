@@ -12,9 +12,6 @@ namespace degnirk.be.Controllers
 {
     public class CalendarController : SurfaceController
     {
-        private const string AccessToken = "442171809217325|Q3rA6b68G7TuWYF1beRUNsLUe94";
-        private const string CreatorId = "56615007038";
-        private const string EventUri = "https://www.facebook.com/events/";
         public List<dynamic> FacebookEvents { get; private set; }
 
         //[OutputCache(Duration = 3600, VaryByParam = "from;to;browser_timezone")]

@@ -74,6 +74,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\UmbracoCms.Core.7.0.4\lib\Examine.dll</HintPath>
     </Reference>
+    <Reference Include="GoogleService, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\GoogleService\bin\Debug\GoogleService.dll</HintPath>
+    </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\packages\HtmlAgilityPack.1.4.6\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
@@ -453,10 +457,6 @@
     <ProjectReference Include="..\FacebookService\FacebookService.csproj">
       <Project>{c80a57d0-adbc-4cdf-b44c-f6bf187d999a}</Project>
       <Name>FacebookService</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GoogleService\GoogleService.csproj">
-      <Project>{5f090a88-1497-4e76-b899-7dc285a7c6ce}</Project>
-      <Name>GoogleService</Name>
     </ProjectReference>
     <ProjectReference Include="..\Helpers\Helpers.csproj">
       <Project>{5D60AFF9-A38F-416E-95D9-23EA9173DE25}</Project>

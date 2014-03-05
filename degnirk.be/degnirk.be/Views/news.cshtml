@@ -1,9 +1,14 @@
 ﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
 @{
     Layout = "content.cshtml";
+
 }
 
 @section innercontent
 {
-    
+    @foreach (var child in Model.Content.Children)
+    {
+        <h4>@child.Name</h4>
+        <article>@child.GetProperty("inhoud").Value</article>
+    }
 }

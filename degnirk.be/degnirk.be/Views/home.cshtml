@@ -1,4 +1,5 @@
-﻿@using System.Linq
+﻿@using System.Collections
+@using System.Linq
 @using degnirk.be.Models
 @using umbraco.MacroEngines
 @using Umbraco.Web.UI.Umbraco.Create
@@ -7,8 +8,8 @@
 @{
     Layout = "master.cshtml";
 
-    Html.RequiresJs("~/scripts/home.js",3);
-    
+    Html.RequiresJs("~/scripts/home.js", 3);
+
     @helper Traverse(IPublishedContent node)
 {
     const int maxLevelForSitemap = 2;
@@ -89,7 +90,7 @@
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
-                      @Traverse(@Model.Content)
+                        @Traverse(@Model.Content)
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li class="navbar-text"><a href="#" id="fb-login-button">&nbsp;</a></li>
@@ -121,10 +122,15 @@
 
         <div class="row">
             <div class="col-sm-4">
-                <h3>Nieuws</h3>
-                <p>
-                    rfzefze rufz afzerfzaer ferf ezgv rfi afgerhjfjze rgeuzr
-                </p>
+                <a href="@Model.Content.Children.SingleOrDefault(c => c.DocumentTypeAlias == "news").UrlName">
+                    <h3>Nieuws</h3>
+                </a>
+                @foreach (var item in Model.Content.Children.SingleOrDefault(c => c.DocumentTypeAlias == "news").Children)
+                {
+                    <h4>@item.Name</h4>
+                    <article>@Html.Raw(item.GetProperty("inhoud").Value.ToString().Substring(0, @item.GetProperty("inhoud").Value.ToString().Length > 100 ? 100 : @item.GetProperty("inhoud").Value.ToString().Length))</article>
+                }
+
                 <button type="button" class="btn btn-default">Meer</button>
             </div>
             <div class="col-md-4" id="evenementen">

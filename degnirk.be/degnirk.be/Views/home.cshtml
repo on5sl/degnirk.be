@@ -122,16 +122,7 @@
 
         <div class="row">
             <div class="col-sm-4">
-                <a href="@Model.Content.Children.SingleOrDefault(c => c.DocumentTypeAlias == "news").UrlName">
-                    <h3>Nieuws</h3>
-                </a>
-                @foreach (var item in Model.Content.Children.SingleOrDefault(c => c.DocumentTypeAlias == "news").Children)
-                {
-                    <h4>@item.Name</h4>
-                    <article>@Html.Raw(item.GetProperty("inhoud").Value.ToString().Substring(0, @item.GetProperty("inhoud").Value.ToString().Length > 100 ? 100 : @item.GetProperty("inhoud").Value.ToString().Length))</article>
-                }
-
-                <button type="button" class="btn btn-default">Meer</button>
+                @{ Html.RenderPartial("~/Views/Partials/NewsRollup.cshtml", new NewsRollupModel() {Content = Model.Content}); }
             </div>
             <div class="col-md-4" id="evenementen">
                 @{ Html.RenderPartial("~/Views/Partials/FacebookEvents.cshtml", new FacebookEventsModel()); }

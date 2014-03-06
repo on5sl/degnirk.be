@@ -259,6 +259,7 @@
     <Compile Include="Models\FacebookEventsModel.cs" />
     <Compile Include="Models\HomeModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
+    <Compile Include="Models\NewsRollupModel.cs" />
     <Compile Include="Models\RentalModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -430,6 +431,7 @@
     <Content Include="xslt\Web.config" />
     <Content Include="Views\news.cshtml" />
     <Content Include="Views\newsitem.cshtml" />
+    <Content Include="Views\Partials\NewsRollup.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

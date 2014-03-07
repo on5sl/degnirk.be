@@ -1,5 +1,6 @@
 ﻿@using System.Collections
 @using System.Linq
+@using degnirk.be.Controllers
 @using degnirk.be.Models
 @using umbraco.MacroEngines
 @using Umbraco.Web.UI.Umbraco.Create
@@ -125,7 +126,7 @@
                 @{ Html.RenderPartial("~/Views/Partials/NewsRollup.cshtml", new NewsRollupModel() {Content = Model.Content}); }
             </div>
             <div class="col-md-4" id="evenementen">
-                @{ Html.RenderPartial("~/Views/Partials/FacebookEvents.cshtml", new FacebookEventsModel()); }
+                @{ Html.RenderAction("GetFacebookEvents", "FacebookEvents");}
             </div>
             <div class="col-sm-4">
                 <a href="evenementen/fotos">

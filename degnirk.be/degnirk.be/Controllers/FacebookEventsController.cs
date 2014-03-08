@@ -1,6 +1,4 @@
-﻿using System;
-using System.Configuration;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using degnirk.be.Models;
 using Service;
 using Umbraco.Web.Mvc;
@@ -8,19 +6,15 @@ using Umbraco.Web.Mvc;
 namespace degnirk.be.Controllers
 {
     public class FacebookEventsController : SurfaceController
-    {
-        private const int NumberOfEvents = 3;
-        private FacebookService _facebookService;
-        
+    {   
         [ChildActionOnly]
-        public PartialViewResult GetFacebookEvents()
+        public PartialViewResult GetFacebookEvents(string facebookAppAccessToken, long facebookPageId, short numberOfEvents)
         {
-            var facebookService = new FacebookService(
-                ConfigurationManager.AppSettings["FacebookAppAccessToken"]);
-            var model = new FacebookEventsModel();
-            model.FacebookEvents = facebookService.GetLatestFacebookEvents(
-                ConfigurationManager.AppSettings["FacebookPageId"],
-                NumberOfEvents);
+            var facebookService = new FacebookService(facebookAppAccessToken);
+            var model = new FacebookEventsModel
+            {
+                FacebookEvents = facebookService.GetLatestFacebookEvents(facebookPageId, numberOfEvents)
+            };
             return PartialView("FacebookEvents", model);
         }
     }

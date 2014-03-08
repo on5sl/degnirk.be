@@ -6,7 +6,7 @@ namespace Service
 {
     public interface IFacebookService
     {
-        IEnumerable<ExpandoObject> GetLatestFacebookEvents(string creatorId, short numberOfEvents);
+        IEnumerable<ExpandoObject> GetLatestFacebookEvents(long creatorId, short numberOfEvents);
 
         IEnumerable<dynamic> GetFacebookEvents(string creatorId, DateTime from, DateTime to);
 

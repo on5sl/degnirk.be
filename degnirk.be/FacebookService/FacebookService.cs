@@ -18,7 +18,7 @@ namespace Service
             _facebookClient = new FacebookClient(accessToken);
         }
 
-        public IEnumerable<ExpandoObject> GetLatestFacebookEvents(string creatorId, short numberOfEvents)
+        public IEnumerable<ExpandoObject> GetLatestFacebookEvents(long creatorId, short numberOfEvents)
         {
             dynamic facebookEvents = ((JsonArray)(_facebookClient.Get("/fql",
                 new

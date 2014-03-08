@@ -92,7 +92,7 @@
             <li class="active">@Model.Content.Name</li>
         </ol>
 
-        @{ Html.RenderPartial("~/Views/Partials/Login.cshtml", new LoginModel()); }
+        @{ Html.RenderPartial("~/Views/Partials/Login.cshtml"); }
         @RenderSection("content")
     </div>
 }

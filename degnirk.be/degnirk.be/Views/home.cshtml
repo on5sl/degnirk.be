@@ -54,7 +54,7 @@
 
         <div class="row">
             <div class="col-sm-4">
-                @{ Html.RenderPartial("~/Views/Partials/NewsRollup.cshtml", new NewsRollupModel() { Content = Model.Content }); }
+                @{ Html.RenderPartial("~/Views/Partials/NewsRollup.cshtml", Model.Content); }
             </div>
             <div class="col-md-4" id="evenementen">
                 @{ Html.RenderAction(

@@ -7,5 +7,6 @@ namespace degnirk.be.Models
 {
     public class HomeModel
     {
+        public string[] Images { get; set; }
     }
 }

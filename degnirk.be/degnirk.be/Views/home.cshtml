@@ -41,16 +41,15 @@
 }
 @section bodycontent
 {
-    @{
-        var mediaId = (int)@Model.Content.GetProperty("mediaPicker").Value;
-        var umbracoHelper = new UmbracoHelper(this.UmbracoContext);
-        var media = umbracoHelper.TypedMedia(mediaId);
-        var images = string.Join(", ", media.Children.Select(i => "'.." + i.Url + "'").RandomOrder());
-    }
-    <script type="text/javascript">
-        var images = [@Html.Raw(images)];
-    </script>
-    
+
+    @{ Html.RenderAction(
+                 "GetMediaPickerImages",
+                 "Home",
+                new
+                {
+                    mediaPicker = Model.Content.GetProperty("mediaPicker")
+                });}
+
     @{ Html.RenderPartial("~/Views/Partials/Login.cshtml"); }
 
     <header>
@@ -121,16 +120,16 @@
 
         <div class="row">
             <div class="col-sm-4">
-                @{ Html.RenderPartial("~/Views/Partials/NewsRollup.cshtml", new NewsRollupModel() {Content = Model.Content}); }
+                @{ Html.RenderPartial("~/Views/Partials/NewsRollup.cshtml", new NewsRollupModel() { Content = Model.Content }); }
             </div>
             <div class="col-md-4" id="evenementen">
                 @{ Html.RenderAction(
-                       "GetFacebookEvents", 
-                       "FacebookEvents", 
+                       "GetFacebookEvents",
+                       "FacebookEvents",
                        new
                        {
-                           facebookAppAccessToken = ConfigurationManager.AppSettings["FacebookAppAccessToken"], 
-                           facebookPageId = long.Parse(ConfigurationManager.AppSettings["FacebookPageId"]), 
+                           facebookAppAccessToken = ConfigurationManager.AppSettings["FacebookAppAccessToken"],
+                           facebookPageId = long.Parse(ConfigurationManager.AppSettings["FacebookPageId"]),
                            numberOfEvents = 3
                        });}
             </div>

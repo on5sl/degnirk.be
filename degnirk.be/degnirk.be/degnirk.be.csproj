@@ -251,6 +251,7 @@
     <Compile Include="Controllers\CalendarController.cs" />
     <Compile Include="Controllers\FacebookAlbumsController.cs" />
     <Compile Include="Controllers\FacebookEventsController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\RentalController.cs" />
     <Compile Include="Global.asax.cs">
@@ -382,7 +383,6 @@
     <Content Include="scripts\jquery-2.1.0.min.map" />
     <None Include="scripts\jquery.validate-vsdoc.js" />
     <Content Include="scripts\jquery.backstretch.js" />
-    <Content Include="scripts\jquery.nicescroll.js" />
     <Content Include="scripts\jquery.validate.js" />
     <Content Include="scripts\jquery.validate.min.js" />
     <Content Include="scripts\jQueryRotate.js" />
@@ -433,6 +433,7 @@
     <Content Include="Views\news.cshtml" />
     <Content Include="Views\newsitem.cshtml" />
     <Content Include="Views\Partials\NewsRollup.cshtml" />
+    <Content Include="Views\Partials\MediaPickerImages.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

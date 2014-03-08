@@ -10,6 +10,7 @@ namespace degnirk.be.Controllers
 {
     public class HomeController : SurfaceController
     {
+        [OutputCache(Duration = 3600, VaryByParam = "mediaPicker")]
         [ChildActionOnly]
         public PartialViewResult GetMediaPickerImages(IPublishedProperty mediaPicker)
         {

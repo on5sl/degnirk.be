@@ -3,7 +3,7 @@
 <a href="@Model.Children.SingleOrDefault(c => c.DocumentTypeAlias == "news").UrlName">
     <h3>Nieuws</h3>
 </a>
-@foreach (var item in Model.Children.SingleOrDefault(c => c.DocumentTypeAlias == "news").Children)
+@foreach (var item in Model.Children.SingleOrDefault(c => c.DocumentTypeAlias == "news").Children.OrderByDescending(c => c.CreateDate))
 {
     <h4>@item.Name</h4>
     <article>@Html.Raw(item.GetProperty("inhoud").Value.ToString().Substring(0, @item.GetProperty("inhoud").Value.ToString().Length > 100 ? 100 : @item.GetProperty("inhoud").Value.ToString().Length))</article>

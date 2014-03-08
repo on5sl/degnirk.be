@@ -260,7 +260,6 @@
     <Compile Include="Models\FacebookAlbumsModel.cs" />
     <Compile Include="Models\FacebookEventsModel.cs" />
     <Compile Include="Models\HomeModel.cs" />
-    <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\NewsRollupModel.cs" />
     <Compile Include="Models\RentalModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

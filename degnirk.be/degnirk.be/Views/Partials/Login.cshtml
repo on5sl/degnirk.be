@@ -1,11 +1,5 @@
 ﻿@using ClientDependency.Core.Mvc
-@using degnirk.be.Controllers
-@model degnirk.be.Models.LoginModel
 
 @{
     Html.RequiresJs("~/scripts/login.js", 3);   
-}
-
-@using (Html.BeginUmbracoForm<LoginController>("HandleLogin"))
-{
 }

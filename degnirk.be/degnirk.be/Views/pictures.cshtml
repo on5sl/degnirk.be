@@ -1,9 +1,17 @@
-﻿@using degnirk.be.Models
+﻿@using System.Configuration
+@using degnirk.be.Models
 @inherits Umbraco.Web.Mvc.UmbracoTemplatePage
 @{
     Layout = "content.cshtml";
 }
 @section innercontent{
     <p>Foto's</p>
-    @{ Html.RenderPartial("~/Views/Partials/FacebookAlbums.cshtml", new FacebookAlbumsModel()); }
+    @{ Html.RenderAction(
+                       "GetFacebookAlbums",
+                       "FacebookAlbums",
+                       new
+                       {
+                           facebookAppAccessToken = ConfigurationManager.AppSettings["FacebookAppAccessToken"],
+                           facebookPageId = long.Parse(ConfigurationManager.AppSettings["FacebookPageId"])
+                       });}
 }

@@ -249,6 +249,7 @@
   <ItemGroup>
     <Compile Include="CodeTemplates\AddView\CSHTML\SurfaceController.cs" />
     <Compile Include="Controllers\CalendarController.cs" />
+    <Compile Include="Controllers\FacebookAlbumsController.cs" />
     <Compile Include="Controllers\FacebookEventsController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\RentalController.cs" />

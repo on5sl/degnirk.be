@@ -78,7 +78,7 @@ namespace Service
                 }.ToExpando();
         }
 
-        public IEnumerable<ExpandoObject> GetFacebookAlbums(string creatorId)
+        public IEnumerable<ExpandoObject> GetFacebookAlbums(long creatorId)
         {
             dynamic facebookAlbums = _facebookClient.Get("/fql",
                 new

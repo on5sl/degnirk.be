@@ -1,43 +1,11 @@
-﻿@using System.Collections
-@using System.Configuration
-@using System.Linq
-@using degnirk.be.Controllers
+﻿@using System.Configuration
 @using degnirk.be.Models
-@using umbraco.MacroEngines
-@using Umbraco.Web.UI.Umbraco.Create
 @using ClientDependency.Core.Mvc
 @inherits Umbraco.Web.Mvc.UmbracoTemplatePage
 @{
     Layout = "master.cshtml";
 
     Html.RequiresJs("~/scripts/home.js", 3);
-
-    @helper Traverse(IPublishedContent node)
-{
-    const int maxLevelForSitemap = 2;
-
-    var values = new Dictionary<string, object>();
-    var items = node.Children.Where(i => i.IsVisible() && i.Level <= maxLevelForSitemap);
-    foreach (var item in items)
-    {
-        if (item.Level < maxLevelForSitemap && @item.Children.Any())
-        {
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">@item.Name <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                    @Traverse(item)
-                </ul>
-            </li>
-        }
-        else
-        {
-            <li>
-                <a href="@item.Url">@item.Name</a>
-                @Traverse(item)
-            </li>
-        }
-    }
-}
 }
 @section bodycontent
 {
@@ -79,43 +47,9 @@
     </header>
 
     <div id="content" class="container">
-        <nav id="navbar" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="#">De Gnirk</a>
-                </div>
 
-                <!-- Collect the nav links, forms, and other content for toggling -->
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <ul class="nav navbar-nav">
-                        @Traverse(@Model.Content)
-                    </ul>
-                    <ul class="nav navbar-nav navbar-right">
-                        <li class="navbar-text"><a href="#" id="fb-login-button">&nbsp;</a></li>
-                        @*the extended permissions: manage_pages,status_update are required for posting a status on behalf of the page*@
-                        <li><span class="fb-login-button navbar-text" perms="user_birthday,email,user_location" data-show-faces="false" data-width="400" data-max-rows="1"></span></li>
-                        <li><a href="#">Link</a></li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#">Action</a></li>
-                                <li><a href="#">Another action</a></li>
-                                <li><a href="#">Something else here</a></li>
-                                <li class="divider"></li>
-                                <li><a href="#">Separated link</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <!-- /.navbar-collapse -->
-        </nav>
+        @{ Html.RenderPartial("~/Views/Partials/Navigation.cshtml", Model.Content);}
+
         <h2 id="home">Home</h2>
 
         <div class="row">

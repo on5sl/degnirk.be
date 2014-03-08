@@ -434,6 +434,7 @@
     <Content Include="Views\newsitem.cshtml" />
     <Content Include="Views\Partials\NewsRollup.cshtml" />
     <Content Include="Views\Partials\MediaPickerImages.cshtml" />
+    <Content Include="Views\Partials\Navigation.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

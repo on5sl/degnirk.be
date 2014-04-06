@@ -29,7 +29,7 @@
             </div>
             <div id="subnav" class="shadow">
                 <h1>
-                    <a href="#home" class="scrollToHref">JEUGDHUIS DE GNIRK</a>
+                    <a href="#nieuws" class="scrollToHref">JEUGDHUIS DE GNIRK</a>
                 </h1>
                 <h2>
                     <a href="evenementen">EVENEMENTEN</a>
@@ -51,7 +51,7 @@
         @{ Html.RenderPartial("~/Views/Partials/Navigation.cshtml", Model.Content);}
 
         <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-4" id="nieuws">
                 @{ Html.RenderPartial("~/Views/Partials/NewsRollup.cshtml", Model.Content); }
             </div>
             <div class="col-md-4" id="evenementen">

@@ -1,4 +1,4 @@
-/*! umbraco - v7.0.0-Beta - 2014-02-17
+/*! umbraco - v7.0.0-Beta - 2014-04-08
  * https://github.com/umbraco/umbraco-cms/tree/7.0.0
  * Copyright (c) 2014 Umbraco HQ;
  * Licensed MIT

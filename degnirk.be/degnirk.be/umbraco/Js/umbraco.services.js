@@ -1,4 +1,4 @@
-/*! umbraco - v7.0.0-Beta - 2014-02-17
+/*! umbraco - v7.0.0-Beta - 2014-04-08
  * https://github.com/umbraco/umbraco-cms/tree/7.0.0
  * Copyright (c) 2014 Umbraco HQ;
  * Licensed MIT
@@ -502,6 +502,17 @@ angular.module('umbraco.services')
 .factory('assetsService', function ($q, $log, angularHelper, umbRequestHelper, $rootScope, $http) {
 
     var initAssetsLoaded = false;
+    var appendRnd = function(url){
+        //if we don't have a global umbraco obj yet, the app is bootstrapping
+        if(!Umbraco.Sys.ServerVariables.application){
+            return url;
+        }
+
+        var rnd = Umbraco.Sys.ServerVariables.isDebuggingEnabled ?  (new Date()).getTime() : Umbraco.Sys.ServerVariables.application.version +"."+Umbraco.Sys.ServerVariables.application.cdf;
+        var _op = (url.indexOf("?")>0) ? "&" : "?";
+        url = url + _op + "umb__rnd=" + rnd;
+        return url;
+    };
 
     return {
         
@@ -543,25 +554,23 @@ angular.module('umbraco.services')
          * @param {Number} timeout in milliseconds
          * @returns {Promise} Promise object which resolves when the file has loaded
          */
-        loadCss : function(path, scope, attributes, timeout){
-            var deferred = $q.defer();
-            var t = timeout || 5000;
-            var a = attributes || undefined;
+         loadCss : function(path, scope, attributes, timeout){
+             var deferred = $q.defer();
+             var t = timeout || 5000;
+             var a = attributes || undefined;
 
-            yepnope.injectCss(path, function () {
+             yepnope.injectCss(appendRnd(path), function () {
+                 if (!scope) {
+                      deferred.resolve(true);
+                  }else{
+                      angularHelper.safeApply(scope, function () {
+                          deferred.resolve(true);
+                      });
+                  }
+             },a,t);
 
-             if (!scope) {
-                 deferred.resolve(true);
-             }else{
-                 angularHelper.safeApply(scope, function () {
-                     deferred.resolve(true);
-                 });
-             }
-
-            },a,t);
-
-            return deferred.promise;
-        },
+             return deferred.promise;
+         },
         
         /**
          * @ngdoc method
@@ -581,9 +590,8 @@ angular.module('umbraco.services')
             var deferred = $q.defer();
             var t = timeout || 5000;
             var a = attributes || undefined;
-
-            yepnope.injectJs(path, function () {
-
+            
+            yepnope.injectJs(appendRnd(path), function () {
               if (!scope) {
                   deferred.resolve(true);
               }else{
@@ -591,8 +599,8 @@ angular.module('umbraco.services')
                       deferred.resolve(true);
                   });
               }
-
             },a,t);
+
 
             return deferred.promise;
         },
@@ -613,14 +621,14 @@ angular.module('umbraco.services')
          */
         load: function (pathArray, scope) {
             var deferred = $q.defer();
-           
+        
             var nonEmpty = _.reject(pathArray, function(item) {
                 return item === undefined || item === "";
             });
 
+
             //don't load anything if there's nothing to load
             if (nonEmpty.length > 0) {
-
                 yepnope({
                     load: pathArray,
                     complete: function() {
@@ -687,6 +695,111 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
             return allProps;
         },
 
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.contentEditingHelper#configureButtons
+         * @methodOf umbraco.services.contentEditingHelper
+         * @function
+         *
+         * @description
+         * Returns a letter array for buttons, with the primary one first based on content model, permissions and editor state
+         */
+         getAllowedActions : function(content, creating){
+
+                //This is the ideal button order but depends on circumstance, we'll use this array to create the button list
+                // Publish, SendToPublish, Save
+                var actionOrder = ["U", "H", "A"];
+                var defaultActions;
+                var actions = [];
+
+                //Create the first button (primary button)
+                //We cannot have the Save or SaveAndPublish buttons if they don't have create permissions when we are creating a new item.
+                if (!creating || _.contains(content.allowedActions, "C")) {
+                    for (var b in actionOrder) {
+                        if (_.contains(content.allowedActions, actionOrder[b])) {
+                            defaultAction = actionOrder[b];
+                            break;
+                        }
+                    }
+                }
+                
+                actions.push(defaultAction);
+
+                //Now we need to make the drop down button list, this is also slightly tricky because:
+                //We cannot have any buttons if there's no default button above.
+                //We cannot have the unpublish button (Z) when there's no publish permission.    
+                //We cannot have the unpublish button (Z) when the item is not published.           
+                if (defaultAction) {
+                    //get the last index of the button order
+                    var lastIndex = _.indexOf(actionOrder, defaultAction);
+
+                    //add the remaining
+                    for (var i = lastIndex + 1; i < actionOrder.length; i++) {
+                        if (_.contains(content.allowedActions, actionOrder[i])) {
+                            actions.push(actionOrder[i]);
+                        }
+                    }
+
+                    //if we are not creating, then we should add unpublish too, 
+                    // so long as it's already published and if the user has access to publish
+                    if (!creating) {
+                        if (content.publishDate && _.contains(content.allowedActions,"U")) {
+                            actions.push("Z");
+                        }
+                    }
+                }
+
+                return actions;
+         },
+
+         /**
+          * @ngdoc method
+          * @name umbraco.services.contentEditingHelper#getButtonFromAction
+          * @methodOf umbraco.services.contentEditingHelper
+          * @function
+          *
+          * @description
+          * Returns a button object to render a button for the tabbed editor
+          * currently only returns built in system buttons for content and media actions
+          * returns label, alias, action char and hot-key
+          */
+          getButtonFromAction : function(ch){
+            switch (ch) {
+                case "U":
+                    return {
+                        letter: ch,
+                        labelKey: "buttons_saveAndPublish",
+                        handler: "saveAndPublish",
+                        hotKey: "ctrl+p"
+                    };
+                case "H":
+                    //send to publish
+                    return {
+                        letter: ch,
+                        labelKey: "buttons_saveToPublish",
+                        handler: "sendToPublish",
+                        hotKey: "ctrl+p"
+                    };
+                case "A":
+                    return {
+                        letter: ch,
+                        labelKey: "buttons_save",
+                        handler: "save",
+                        hotKey: "ctrl+s"
+                    };
+                case "Z":
+                    return {
+                        letter: ch,
+                        labelKey: "content_unPublish",
+                        handler: "unPublish"
+                    };
+
+                default:
+                    return null;
+            }
+
+          },
         /**
          * @ngdoc method
          * @name umbraco.services.contentEditingHelper#reBindChangedProperties
@@ -874,6 +987,178 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
     };
 }
 angular.module('umbraco.services').factory('contentEditingHelper', contentEditingHelper);
+/**
+* @ngdoc service
+* @name umbraco.services.cropperHelper
+* @description A helper object used for dealing with image cropper data
+**/
+function cropperHelper(umbRequestHelper, $http) {
+	var service = {
+
+		/**
+		* @ngdoc method
+		* @name umbraco.services.cropperHelper#configuration
+		* @methodOf umbraco.services.cropperHelper
+		*
+		* @description
+		* Returns a collection of plugins available to the tinyMCE editor
+		*
+		*/
+		configuration: function (mediaTypeAlias) {
+			return umbRequestHelper.resourcePromise(
+				$http.get(
+					umbRequestHelper.getApiUrl(
+						"imageCropperApiBaseUrl",
+						"GetConfiguration",
+						[{ mediaTypeAlias: mediaTypeAlias}])),
+				'Failed to retrieve tinymce configuration');
+		},
+
+
+		//utill for getting either min/max aspect ratio to scale image after
+		calculateAspectRatioFit : function(srcWidth, srcHeight, maxWidth, maxHeight, maximize) {
+			var ratio = [maxWidth / srcWidth, maxHeight / srcHeight ];
+
+			if(maximize){
+				ratio = Math.max(ratio[0], ratio[1]);
+			}else{
+				ratio = Math.min(ratio[0], ratio[1]);
+			}
+
+			return { width:srcWidth*ratio, height:srcHeight*ratio, ratio: ratio};
+		},
+
+		//utill for scaling width / height given a ratio
+		calculateSizeToRatio : function(srcWidth, srcHeight, ratio) {
+			return { width:srcWidth*ratio, height:srcHeight*ratio, ratio: ratio};
+		},
+
+		scaleToMaxSize : function(srcWidth, srcHeight, maxSize) {
+			
+			var retVal = {height: srcHeight, width: srcWidth};
+
+			if(srcWidth > maxSize ||srcHeight > maxSize){
+				var ratio = [maxSize / srcWidth, maxSize / srcHeight ];
+				ratio = Math.min(ratio[0], ratio[1]);
+				
+				retVal.height = srcHeight * ratio;
+				retVal.width = srcWidth * ratio;
+			}
+			
+			return retVal;			
+		},
+
+		//returns a ng-style object with top,left,width,height pixel measurements
+		//expects {left,right,top,bottom} - {width,height}, {width,height}, int
+		//offset is just to push the image position a number of pixels from top,left    
+		convertToStyle : function(coordinates, originalSize, viewPort, offset){
+
+			var coordinates_px = service.coordinatesToPixels(coordinates, originalSize, offset);
+			var _offset = offset || 0;
+
+			var x = 1 - (coordinates.x1 + Math.abs(coordinates.x2));
+			var left_of_x =  originalSize.width * x;
+			var ratio = viewPort.width / left_of_x;
+
+			var style = {
+				position: "absolute",
+				top:  -(coordinates_px.y1*ratio)+ _offset,
+				left:  -(coordinates_px.x1* ratio)+ _offset,
+				width: Math.floor(originalSize.width * ratio),
+				height: Math.floor(originalSize.height * ratio),
+				originalWidth: originalSize.width,
+				originalHeight: originalSize.height,
+				ratio: ratio
+			};
+
+			return style;
+		},
+
+		 
+		coordinatesToPixels : function(coordinates, originalSize, offset){
+
+			var coordinates_px = {
+				x1: Math.floor(coordinates.x1 * originalSize.width),
+				y1: Math.floor(coordinates.y1 * originalSize.height),
+				x2: Math.floor(coordinates.x2 * originalSize.width),
+				y2: Math.floor(coordinates.y2 * originalSize.height)								 
+			};
+
+			return coordinates_px;
+		},
+
+		pixelsToCoordinates : function(image, width, height, offset){
+
+			var x1_px = Math.abs(image.left-offset);
+			var y1_px = Math.abs(image.top-offset);
+
+			var x2_px = image.width - (x1_px + width);
+			var y2_px = image.height - (y1_px + height);
+
+
+			//crop coordinates in %
+			var crop = {};
+			crop.x1 = x1_px / image.width;
+			crop.y1 = y1_px / image.height;
+			crop.x2 = x2_px / image.width;
+			crop.y2 = y2_px / image.height;
+
+			_.forEach(crop, function(coord){
+				if(coord < 0){
+					coord = 0;
+				}
+			});
+
+			return crop;
+		},
+
+		centerInsideViewPort : function(img, viewport){
+			var left = viewport.width/ 2 - img.width / 2,
+				top = viewport.height / 2 - img.height / 2;
+			
+			return {left: left, top: top};
+		},
+
+		alignToCoordinates : function(image, center, viewport){
+			
+			var min_left = (image.width) - (viewport.width);
+			var min_top =  (image.height) - (viewport.height);
+
+			var c_top = -(center.top * image.height) + (viewport.height / 2);
+			var c_left = -(center.left * image.width) + (viewport.width / 2);
+
+			if(c_top < -min_top){
+				c_top = -min_top;
+			}
+			if(c_top > 0){
+				c_top = 0;
+			}
+			if(c_left < -min_left){
+				c_left = -min_left;
+			}
+			if(c_left > 0){
+				c_left = 0;
+			}
+			return {left: c_left, top: c_top};
+		},
+
+
+		syncElements : function(source, target){
+				target.height(source.height());
+				target.width(source.width());
+
+				target.css({
+					"top": source[0].offsetTop,
+					"left": source[0].offsetLeft
+				});
+		}
+	};
+
+	return service;
+}
+
+angular.module('umbraco.services').factory('cropperHelper', cropperHelper);
+
 /**
  * @ngdoc service
  * @name umbraco.services.dialogService
@@ -2125,6 +2410,74 @@ function iconHelper($q, $timeout) {
     };
 }
 angular.module('umbraco.services').factory('iconHelper', iconHelper);
+/**
+* @ngdoc service
+* @name umbraco.services.imageHelper
+* @deprecated
+**/
+function imageHelper(umbRequestHelper, mediaHelper) {
+    return {
+        /**
+         * @ngdoc function
+         * @name umbraco.services.imageHelper#getImagePropertyValue
+         * @methodOf umbraco.services.imageHelper
+         * @function    
+         *
+         * @deprecated
+         */
+        getImagePropertyValue: function (options) {
+            return mediaHelper.getImagePropertyValue(options);
+        },
+        /**
+         * @ngdoc function
+         * @name umbraco.services.imageHelper#getThumbnail
+         * @methodOf umbraco.services.imageHelper
+         * @function    
+         *
+         * @deprecated
+         */
+        getThumbnail: function (options) {
+            return mediaHelper.getThumbnail(options);
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.imageHelper#scaleToMaxSize
+         * @methodOf umbraco.services.imageHelper
+         * @function    
+         *
+         * @deprecated
+         */
+        scaleToMaxSize: function (maxSize, width, height) {
+            return mediaHelper.scaleToMaxSize(maxSize, width, height);
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.imageHelper#getThumbnailFromPath
+         * @methodOf umbraco.services.imageHelper
+         * @function    
+         *
+         * @deprecated
+         */
+        getThumbnailFromPath: function (imagePath) {
+            return mediaHelper.getThumbnailFromPath(imagePath);
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.imageHelper#detectIfImageByExtension
+         * @methodOf umbraco.services.imageHelper
+         * @function    
+         *
+         * @deprecated
+         */
+        detectIfImageByExtension: function (imagePath) {
+            return mediaHelper.detectIfImageByExtension(imagePath);
+        }
+    };
+}
+angular.module('umbraco.services').factory('imageHelper', imageHelper);
 // This service was based on OpenJS library available in BSD License
 // http://www.openjs.com/scripts/events/keyboard_shortcuts/index.php
 angular.module('umbraco.services')
@@ -2526,11 +2879,11 @@ angular.module('umbraco.services')
 function macroService() {
 
     return {
-        
+       
         /** parses the special macro syntax like <?UMBRACO_MACRO macroAlias="Map" /> and returns an object with the macro alias and it's parameters */
         parseMacroSyntax: function (syntax) {
 
-            var expression = /(<\?UMBRACO_MACRO macroAlias=["']([\w\.]+?)["'].+?)(\/>|>.*?<\/\?UMBRACO_MACRO>)/im;
+            var expression = /(<\?UMBRACO_MACRO macroAlias=["']([\w\.]+?)["'][\s\S]+?)(\/>|>.*?<\/\?UMBRACO_MACRO>)/i;
             var match = expression.exec(syntax);
             if (!match || match.length < 3) {
                 return null;
@@ -2540,14 +2893,15 @@ function macroService() {
             //this will leave us with just the parameters
             var paramsChunk = match[1].trim().replace(new RegExp("UMBRACO_MACRO macroAlias=[\"']" + alias + "[\"']"), "").trim();
             
-            var paramExpression = new RegExp("(\\w+?)=['\"](.*?)['\"]", "g");
+            var paramExpression = /(\w+?)=['\"]([\s\S]*?)['\"]/g;
+            
             var paramMatch;
             var returnVal = {
                 macroAlias: alias,
-                marcoParamsDictionary: {}
+                macroParamsDictionary: {}
             };
             while (paramMatch = paramExpression.exec(paramsChunk)) {
-                returnVal.marcoParamsDictionary[paramMatch[1]] = paramMatch[2];
+                returnVal.macroParamsDictionary[paramMatch[1]] = paramMatch[2];
             }
             return returnVal;
         },
@@ -2569,9 +2923,9 @@ function macroService() {
 
             var macroString = '<?UMBRACO_MACRO macroAlias=\"' + args.macroAlias + "\" ";
 
-            if (args.marcoParamsDictionary) {
+            if (args.macroParamsDictionary) {
 
-                _.each(args.marcoParamsDictionary, function (val, key) {
+                _.each(args.macroParamsDictionary, function (val, key) {
                     //check for null
                     val = val ? val : "";
                     //need to detect if the val is a string or an object
@@ -2612,9 +2966,9 @@ function macroService() {
             
             var macroString = '<umbraco:Macro ';
 
-            if (args.marcoParamsDictionary) {
+            if (args.macroParamsDictionary) {
                 
-                _.each(args.marcoParamsDictionary, function (val, key) {
+                _.each(args.macroParamsDictionary, function (val, key) {
                     var keyVal = key + "=\"" + (val ? val : "") + "\" ";
                     macroString += keyVal;
                 });
@@ -2643,11 +2997,11 @@ function macroService() {
 
             var hasParams = false;
             var paramString;
-            if (args.marcoParamsDictionary) {
+            if (args.macroParamsDictionary) {
                 
                 paramString = ", new {";
 
-                _.each(args.marcoParamsDictionary, function(val, key) {
+                _.each(args.macroParamsDictionary, function(val, key) {
 
                     hasParams = true;
                     
@@ -2680,6 +3034,10 @@ angular.module('umbraco.services').factory('macroService', macroService);
 * @description A helper object used for dealing with media items
 **/
 function mediaHelper(umbRequestHelper) {
+    
+    //container of fileresolvers
+    var _mediaFileResolvers = {};
+
     return {
         /**
          * @ngdoc function
@@ -2717,7 +3075,7 @@ function mediaHelper(umbRequestHelper) {
 
                 //this performs a simple check to see if we have a media file as value
                 //it doesnt catch everything, but better then nothing
-                if (item.value.indexOf(mediaRoot) === 0) {
+                if (angular.isString(item.value) &&  item.value.indexOf(mediaRoot) === 0) {
                     return true;
                 }
 
@@ -2797,6 +3155,74 @@ function mediaHelper(umbRequestHelper) {
             return "";
         },
 
+        registerFileResolver: function(propertyEditorAlias, func){
+            _mediaFileResolvers[propertyEditorAlias] = func;
+        },
+
+        /*jshint loopfunc: true */
+        resolveFile : function(mediaItem, thumbnail){
+            var _props = [];
+            function _iterateProps(props){
+                var result = null;
+                for(var resolver in _mediaFileResolvers) {
+                    var property = _.find(props, function(property){ return property.editor === resolver; });
+                    if(property){
+                        result = _mediaFileResolvers[resolver](property, mediaItem, thumbnail);
+                        break;
+                    }
+                }
+
+                return result;    
+            }
+
+            //we either have properties raw on the object, or spread out on tabs
+            var result = "";
+            if(mediaItem.properties){
+                result = _iterateProps(mediaItem.properties);
+            }else if(mediaItem.tabs){
+                for(var tab in mediaItem.tabs) {
+                    if(mediaItem.tabs[tab].properties){
+                        result = _iterateProps(mediaItem.tabs[tab].properties);
+                        if(result){
+                            break;
+                        }
+                    }
+                }
+            }
+            return result;            
+        },
+
+        /*jshint loopfunc: true */
+        hasFilePropertyType : function(mediaItem){
+           function _iterateProps(props){
+               var result = false;
+               for(var resolver in _mediaFileResolvers) {
+                   var property = _.find(props, function(property){ return property.editor === resolver; });
+                   if(property){
+                       result = true;
+                       break;
+                   }
+               }
+               return result;
+           }
+
+           //we either have properties raw on the object, or spread out on tabs
+           var result = false;
+           if(mediaItem.properties){
+               result = _iterateProps(mediaItem.properties);
+           }else if(mediaItem.tabs){
+               for(var tab in mediaItem.tabs) {
+                   if(mediaItem.tabs[tab].properties){
+                       result = _iterateProps(mediaItem.tabs[tab].properties);
+                       if(result){
+                           break;
+                       }
+                   }
+               }
+           }
+           return result;
+        },
+
         /**
          * @ngdoc function
          * @name umbraco.services.mediaHelper#scaleToMaxSize
@@ -2853,6 +3279,11 @@ function mediaHelper(umbRequestHelper) {
          */
         getThumbnailFromPath: function (imagePath) {
 
+            //If the path is not an image we cannot get a thumb
+            if (!this.detectIfImageByExtension(imagePath)) {
+                return null;
+            }
+
             //get the proxy url for big thumbnails (this ensures one is always generated)
             var thumbnailUrl = umbRequestHelper.getApiUrl(
                 "imagesApiBaseUrl",
@@ -2881,78 +3312,10 @@ function mediaHelper(umbRequestHelper) {
             var ext = lowered.substr(lowered.lastIndexOf(".") + 1);
             return ("," + Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes + ",").indexOf("," + ext + ",") !== -1;
         }
+        
     };
 }
 angular.module('umbraco.services').factory('mediaHelper', mediaHelper);
-
-/**
-* @ngdoc service
-* @name umbraco.services.imageHelper
-* @deprecated
-**/
-function imageHelper(umbRequestHelper, mediaHelper) {
-    return {
-        /**
-         * @ngdoc function
-         * @name umbraco.services.imageHelper#getImagePropertyValue
-         * @methodOf umbraco.services.imageHelper
-         * @function    
-         *
-         * @deprecated
-         */
-        getImagePropertyValue: function (options) {
-            return mediaHelper.getImagePropertyValue(options);
-        },
-        /**
-         * @ngdoc function
-         * @name umbraco.services.imageHelper#getThumbnail
-         * @methodOf umbraco.services.imageHelper
-         * @function    
-         *
-         * @deprecated
-         */
-        getThumbnail: function (options) {
-            return mediaHelper.getThumbnail(options);
-        },
-
-        /**
-         * @ngdoc function
-         * @name umbraco.services.imageHelper#scaleToMaxSize
-         * @methodOf umbraco.services.imageHelper
-         * @function    
-         *
-         * @deprecated
-         */
-        scaleToMaxSize: function (maxSize, width, height) {
-            return mediaHelper.scaleToMaxSize(maxSize, width, height);
-        },
-
-        /**
-         * @ngdoc function
-         * @name umbraco.services.imageHelper#getThumbnailFromPath
-         * @methodOf umbraco.services.imageHelper
-         * @function    
-         *
-         * @deprecated
-         */
-        getThumbnailFromPath: function (imagePath) {
-            return mediaHelper.getThumbnailFromPath(imagePath);
-        },
-
-        /**
-         * @ngdoc function
-         * @name umbraco.services.imageHelper#detectIfImageByExtension
-         * @methodOf umbraco.services.imageHelper
-         * @function    
-         *
-         * @deprecated
-         */
-        detectIfImageByExtension: function (imagePath) {
-            return mediaHelper.detectIfImageByExtension(imagePath);
-        }
-    };
-}
-angular.module('umbraco.services').factory('imageHelper', imageHelper);
 /**
  * @ngdoc service
  * @name umbraco.services.umbracoMenuActions
@@ -2994,8 +3357,8 @@ function umbracoMenuActions($q, treeService, $location, navigationService, appSt
             
             //to find a visible tree node, we'll go get the currently loaded root node from appState
             var treeRoot = appState.getTreeState("currentRootNode");
-            if (treeRoot) {
-                var treeNode = treeService.getDescendantNode(treeRoot, args.entity.id, args.treeAlias);
+            if (treeRoot && treeRoot.root) {
+                var treeNode = treeService.getDescendantNode(treeRoot.root, args.entity.id, args.treeAlias);
                 if (treeNode) {
                     treeService.loadNodeChildren({ node: treeNode, section: args.section });
                 }                
@@ -3788,6 +4151,18 @@ angular.module('umbraco.services')
 .factory('notificationsService', function ($rootScope, $timeout, angularHelper) {
 
 	var nArray = [];
+	function setViewPath(view){
+		if(view.indexOf('/') < 0)
+		{
+			view = "views/common/notifications/" + view;
+		}
+
+		if(view.indexOf('.html') < 0)
+		{
+			view = view + ".html";
+		}
+		return view;
+	}
 
 	var service = {
 
@@ -3803,6 +4178,8 @@ angular.module('umbraco.services')
 		* @param {String} item.message longer text for the notication, trimmed after 200 characters, which can then be exanded
 		* @param {String} item.type Notification type, can be: "success","warning","error" or "info" 
 		* @param {String} item.url url to open when notification is clicked
+		* @param {String} item.view path to custom view to load into the notification box
+		* @param {Array} item.actions Collection of button actions to append (label, func, cssClass)
 		* @param {Boolean} item.sticky if set to true, the notification will not auto-close
 		* @returns {Object} args notification object
 		*/
@@ -3810,14 +4187,22 @@ angular.module('umbraco.services')
 		add: function(item) {
 			angularHelper.safeApply($rootScope, function () {
 
+				if(item.view){
+					item.view = setViewPath(item.view);
+					item.sticky = true;
+					item.type = "form";
+					item.headline = null;
+				}
+
+
 				//add a colon after the headline if there is a message as well
 				if (item.message) {
-					item.headline += ":";
+					item.headline += ": ";
 					if(item.message.length > 200) {
 						item.sticky = true;
 					}
-				}
-
+				}	
+			
 				//we need to ID the item, going by index isn't good enough because people can remove at different indexes 
 				// whenever they want. Plus once we remove one, then the next index will be different. The only way to 
 				// effectively remove an item is by an Id.
@@ -3842,6 +4227,23 @@ angular.module('umbraco.services')
 				return item;
 			});
 
+		},
+
+		hasView : function(view){
+			if(!view){
+				return _.find(nArray, function(notification){ return notification.view;});
+			}else{
+				view = setViewPath(view).toLowerCase();
+				return _.find(nArray, function(notification){ return notification.view.toLowerCase() === view;});
+			}	
+		},
+		addView: function(view, args){
+			var item = {
+				args: args,
+				view: view
+			};
+
+			service.add(item);
 		},
 
 	    /**
@@ -3968,10 +4370,17 @@ angular.module('umbraco.services')
 		 *
 		 * @param {Int} index index where the notication should be removed from
 		 */
-	    remove: function (index) {
-	        angularHelper.safeApply($rootScope, function() {
-	            nArray.splice(index, 1);
-	        });
+		remove: function (index) {
+			if(angular.isObject(index)){
+				var i = nArray.indexOf(index);
+				angularHelper.safeApply($rootScope, function() {
+				    nArray.splice(i, 1);
+				});
+			}else{
+				angularHelper.safeApply($rootScope, function() {
+				    nArray.splice(index, 1);
+				});	
+			}
 		},
 
 		/**
@@ -4596,7 +5005,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                       umbRequestHelper.getApiUrl(
                           "rteApiBaseUrl",
                           "GetConfiguration")),
-                  'Failed to retreive entity data for id '); 
+                  'Failed to retrieve tinymce configuration');
         },
 
         /**
@@ -4657,18 +5066,34 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                 icon: 'custom icon-picture',
                 tooltip: 'Media Picker',
                 onclick: function () {
+
+                    var selectedElm = editor.selection.getNode(),
+                        currentTarget;
+
+
+                    if(selectedElm.nodeName === 'IMG'){
+                        var img = $(selectedElm);
+                        currentTarget = {
+                            name: img.attr("alt"),
+                            url: img.attr("src"),
+                            id: img.attr("rel")
+                        };
+                    }
+
                     dialogService.mediaPicker({
+                        currentTarget: currentTarget,
                         onlyImages: true,
+                        showDetails: true,
                         scope: $scope, callback: function (img) {
 
                             if (img) {
-                                var imagePropVal = imageHelper.getImagePropertyValue({ imageModel: img, scope: $scope });
+                                
                                 var data = {
-                                    alt: "Some description",
-                                    src: (imagePropVal) ? imagePropVal : "nothing.jpg",
+                                    alt: img.name,
+                                    src: (img.url) ? img.url : "nothing.jpg",
+                                    rel: img.id,
                                     id: '__mcenew'
                                 };
-
 
                                 editor.insertContent(editor.dom.createHTML('img', data));
 
@@ -4677,11 +5102,16 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                                     var size = editor.dom.getSize(imgElm);
 
                                     var newSize = imageHelper.scaleToMaxSize(500, size.w, size.h);
+
                                     var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
                                     editor.dom.setAttrib(imgElm, 'style', s);
-                                    editor.dom.setAttrib(imgElm, 'rel', newSize.width + "," + newSize.height);
                                     editor.dom.setAttrib(imgElm, 'id', null);
 
+                                    if(img.url){
+                                        var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
+                                        editor.dom.setAttrib(imgElm, 'data-mce-src', src);
+                                    }
+                                 
                                 }, 500);
                             }
                         }
@@ -4703,8 +5133,6 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
         */
         createLinkPicker: function (editor, $scope) {
 
-            
-            
             /*
             editor.addButton('link', {
                 icon: 'custom icon-link',
@@ -4809,7 +5237,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
 
                 //need to wrap in safe apply since this might be occuring outside of angular
                 angularHelper.safeApply($scope, function() {
-                    macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.marcoParamsDictionary)
+                    macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.macroParamsDictionary)
                     .then(function (htmlResult) {
 
                         $macroDiv.removeClass("loading");
@@ -5080,6 +5508,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
 }
 
 angular.module('umbraco.services').factory('tinyMceService', tinyMceService);
+
 
 /**
  * @ngdoc service
@@ -6225,7 +6654,9 @@ angular.module('umbraco.services')
     there are no more seconds remaining.
     */
     function countdownUserTimeout() {
-        $timeout(function() {
+
+        $timeout(function () {
+
             if (currentUser) {
                 //countdown by 2 seconds since that is how long our timer is for.
                 currentUser.remainingAuthSeconds -= 2;
@@ -6234,18 +6665,24 @@ angular.module('umbraco.services')
                 if (currentUser.remainingAuthSeconds > 30) {
 
                     //we need to check when the last time the timeout was set from the server, if 
-                    // it has been more than 30 seconds then we'll manually go and retreive it from the 
+                    // it has been more than 30 seconds then we'll manually go and retrieve it from the 
                     // server - this helps to keep our local countdown in check with the true timeout.
                     if (lastServerTimeoutSet != null) {
                         var now = new Date();
                         var seconds = (now.getTime() - lastServerTimeoutSet.getTime()) / 1000;
+
                         if (seconds > 30) {
+
                             //first we'll set the lastServerTimeoutSet to null - this is so we don't get back in to this loop while we 
                             // wait for a response from the server otherwise we'll be making double/triple/etc... calls while we wait.
                             lastServerTimeoutSet = null;
+
                             //now go get it from the server
-                            authResource.getRemainingTimeoutSeconds().then(function(result) {
-                                setUserTimeoutInternal(result);
+                            //NOTE: the safeApply because our timeout is set to not run digests (performance reasons)
+                            angularHelper.safeApply($rootScope, function() {                                
+                                authResource.getRemainingTimeoutSeconds().then(function (result) {                            
+                                    setUserTimeoutInternal(result);
+                                });
                             });
                         }
                     }
@@ -6255,10 +6692,10 @@ angular.module('umbraco.services')
                 }
                 else {
 
-                    //we are either timed out or very close to timing out so we need to show the login dialog.                    
-                    //NOTE: the safeApply because our timeout is set to not run digests (performance reasons)
+                    //we are either timed out or very close to timing out so we need to show the login dialog.                                        
                     if (Umbraco.Sys.ServerVariables.umbracoSettings.keepUserLoggedIn !== true) {
-                        angularHelper.safeApply($rootScope, function() {
+                        //NOTE: the safeApply because our timeout is set to not run digests (performance reasons)
+                        angularHelper.safeApply($rootScope, function () {
                             userAuthExpired();
                         });
                     }
@@ -6269,9 +6706,13 @@ angular.module('umbraco.services')
                             //first we'll set the lastServerTimeoutSet to null - this is so we don't get back in to this loop while we 
                             // wait for a response from the server otherwise we'll be making double/triple/etc... calls while we wait.
                             lastServerTimeoutSet = null;
+
                             //now go get it from the server
-                            authResource.getRemainingTimeoutSeconds().then(function (result) {
-                                setUserTimeoutInternal(result);
+                            //NOTE: the safeApply because our timeout is set to not run digests (performance reasons)
+                            angularHelper.safeApply($rootScope, function() {
+                                authResource.getRemainingTimeoutSeconds().then(function (result) {
+                                    setUserTimeoutInternal(result);
+                                });
                             });
                         }
                         
@@ -6409,44 +6850,37 @@ angular.module('umbraco.services')
 
 /*Contains multiple services for various helper tasks */
 
-function packageHelper(assetsService, treeService, eventsService) {
+function packageHelper(assetsService, treeService, eventsService, $templateCache) {
 
     return {
 
         /** Called when a package is installed, this resets a bunch of data and ensures the new package assets are loaded in */
         packageInstalled: function () {
-            //assetsService._reloadApplicationAssets().then(function() {
-            //    treeService.clearCache();
-            //    //send event
-            //    //eventsService.emit("app.reInitialize");
 
-            //    //TODO: This doesn't work and will end in an infinite browser load loop, we can't really 
-            //    // re-bootstrap anyways since that would be the same as loading the whole browser window.
-            //    //angular.bootstrap(document, ['umbraco']);
-            //});
+            //clears the tree
+            treeService.clearCache();
+
+            //clears the template cache
+            $templateCache.removeAll();
+
+            //emit event to notify anything else
+            eventsService.emit("app.reInitialize");
         }
 
     };
 }
 angular.module('umbraco.services').factory('packageHelper', packageHelper);
 
-function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, umbRequestHelper) {
+function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, mediaHelper, umbRequestHelper) {
     return {
-        /** sets the image's url - will check if it is a folder or a real image */
-        setImageUrl: function(img) {
-            //get the image property (if one exists)
-            var imageProp = imageHelper.getImagePropertyValue({ imageModel: img });
-            if (!imageProp) {
-                img.thumbnail = "none";
-            }
-            else {
+        /** sets the image's url, thumbnail and if its a folder */
+        setImageData: function(img) {
+            
+            img.isFolder = !mediaHelper.hasFilePropertyType(img);
 
-                //get the proxy url for big thumbnails (this ensures one is always generated)
-                var thumbnailUrl = umbRequestHelper.getApiUrl(
-                    "imagesApiBaseUrl",
-                    "GetBigThumbnail",
-                    [{ mediaId: img.id }]);
-                img.thumbnail = thumbnailUrl;
+            if(!img.isFolder){
+                img.thumbnail = mediaHelper.resolveFile(img, true);
+                img.image = mediaHelper.resolveFile(img, false);    
             }
         },
 
@@ -6614,7 +7048,7 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, um
 
                 //in this case, a single image will not fit into the row so we need to crop/center
                 // width the full width and the min display height
-                if (imgs.length > 1 && imageRowHeight.imgCount === 1) {
+                if (imageRowHeight.imgCount === 1) {
                     sizes.push({
                         width: targetWidth,
                         //ensure that the height is rounded
@@ -6668,15 +7102,22 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, um
         },
 
         /** Creates the image grid with calculated widths/heights for images to fill the grid nicely */
-        buildGrid: function(images, maxRowWidth, maxRowHeight, startingIndex, minDisplayHeight, idealImgPerRow, margin) {
+        buildGrid: function(images, maxRowWidth, maxRowHeight, startingIndex, minDisplayHeight, idealImgPerRow, margin,imagesOnly) {
 
             var rows = [];
             var imagesProcessed = 0;
 
             //first fill in all of the original image sizes and URLs
             for (var i = startingIndex; i < images.length; i++) {
-                this.setImageUrl(images[i]);
-                this.setOriginalSize(images[i], maxRowHeight);
+                var item = images[i];
+
+                this.setImageData(item);
+                this.setOriginalSize(item, maxRowHeight);
+
+                if(imagesOnly && !item.isFolder && !item.thumbnail){
+                    images.splice(i, 1);
+                    i--;
+                }
             }
 
             while ((imagesProcessed + startingIndex) < images.length) {
@@ -6806,7 +7247,7 @@ function updateChecker($http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "updateCheckApiBaseUrl",
                        "GetCheck")),
-               'Failed to retreive update status');
+               'Failed to retrieve update status');
         }  
     };
 }
@@ -6936,13 +7377,13 @@ function umbDataFormatter() {
                         //we know the current property matches an alias, now we need to determine which membership provider property it was for
                         // by looking at the key
                         switch (foundAlias[0]) {
-                            case "umbracoLockPropertyTypeAlias":
+                            case "umbracoMemberLockedOut":
                                 saveModel.isLockedOut = prop.value.toString() === "1" ? true : false;
                                 break;
-                            case "umbracoApprovePropertyTypeAlias":
+                            case "umbracoMemberApproved":
                                 saveModel.isApproved = prop.value.toString() === "1" ? true : false;
                                 break;
-                            case "umbracoCommentPropertyTypeAlias":
+                            case "umbracoMemberComments":
                                 saveModel.comments = prop.value;
                                 break;
                         }

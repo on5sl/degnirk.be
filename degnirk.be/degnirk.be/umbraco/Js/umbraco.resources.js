@@ -1,4 +1,4 @@
-/*! umbraco - v7.0.0-Beta - 2014-02-17
+/*! umbraco - v7.0.0-Beta - 2014-04-08
  * https://github.com/umbraco/umbraco-cms/tree/7.0.0
  * Copyright (c) 2014 Umbraco HQ;
  * Licensed MIT
@@ -373,7 +373,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "contentApiBaseUrl",
                        "GetById",
                        [{ id: id }])),
-               'Failed to retreive data for content id ' + id);
+               'Failed to retrieve data for content id ' + id);
         },
         
         /**
@@ -410,7 +410,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "contentApiBaseUrl",
                        "GetByIds",
                        idQuery)),
-               'Failed to retreive data for content with multiple ids');
+               'Failed to retrieve data for content with multiple ids');
         },
 
         
@@ -454,7 +454,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "contentApiBaseUrl",
                        "GetEmpty",
                        [{ contentTypeAlias: alias }, { parentId: parentId }])),
-               'Failed to retreive data for empty content item type ' + alias);
+               'Failed to retrieve data for empty content item type ' + alias);
         },
 
         /**
@@ -550,7 +550,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                            { orderDirection: options.orderDirection },
                            { filter: options.filter }
                        ])),
-               'Failed to retreive children for content item ' + parentId);
+               'Failed to retrieve children for content item ' + parentId);
         },
 
         /**
@@ -792,12 +792,13 @@ function contentTypeResource($q, $http, umbRequestHelper) {
                        "contentTypeApiBaseUrl",
                        "GetAllowedChildren",
                        [{ contentId: contentId }])),
-               'Failed to retreive data for content id ' + contentId);
+               'Failed to retrieve data for content id ' + contentId);
         }
 
     };
 }
 angular.module('umbraco.resources').factory('contentTypeResource', contentTypeResource);
+
 /**
     * @ngdoc service
     * @name umbraco.resources.currentUserResource
@@ -845,7 +846,7 @@ function currentUserResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "currentUserApiBaseUrl",
                        "GetMembershipProviderConfig")),
-               'Failed to retreive membership provider config');
+               'Failed to retrieve membership provider config');
         },
     };
 }
@@ -929,7 +930,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "dataTypeApiBaseUrl",
                        "GetPreValues",
                        [{ editorAlias: editorAlias }, { dataTypeId: dataTypeId }])),
-               'Failed to retreive pre values for editor alias ' + editorAlias);
+               'Failed to retrieve pre values for editor alias ' + editorAlias);
         },
 
         /**
@@ -960,7 +961,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "dataTypeApiBaseUrl",
                        "GetById",
                        [{ id: id }])),
-               'Failed to retreive data for data type id ' + id);
+               'Failed to retrieve data for data type id ' + id);
         },
 
         getAll: function () {
@@ -1176,7 +1177,7 @@ function entityResource($q, $http, umbRequestHelper) {
                        "entityApiBaseUrl",
                        "GetById",
                        [{ id: id}, {type: type }])),
-               'Failed to retreive entity data for id ' + id);
+               'Failed to retrieve entity data for id ' + id);
         },
         
         getByQuery: function (query, nodeContextId, type) {            
@@ -1186,7 +1187,7 @@ function entityResource($q, $http, umbRequestHelper) {
                        "entityApiBaseUrl",
                        "GetByQuery",
                        [{query: query},{ nodeContextId: nodeContextId}, {type: type }])),
-               'Failed to retreive entity data for query ' + query);
+               'Failed to retrieve entity data for query ' + query);
         },
 
         /**
@@ -1460,7 +1461,7 @@ function logResource($q, $http, umbRequestHelper) {
                        "logApiBaseUrl",
                        "GetEntityLog",
                        [{ id: id }])),
-               'Failed to retreive user data for id ' + id);
+               'Failed to retrieve user data for id ' + id);
         },
         
         /**
@@ -1491,7 +1492,7 @@ function logResource($q, $http, umbRequestHelper) {
                        "logApiBaseUrl",
                        "GetCurrentUserLog",
                        [{ logtype: type, sinceDate: since }])),
-               'Failed to retreive user data for id ' + id);
+               'Failed to retrieve user data for id ' + id);
         },
 
         /**
@@ -1558,7 +1559,7 @@ function macroResource($q, $http, umbRequestHelper) {
                        "macroApiBaseUrl",
                        "GetMacroParameters",
                        [{ macroId: macroId }])),
-               'Failed to retreive macro parameters for macro with id  ' + macroId);
+               'Failed to retrieve macro parameters for macro with id  ' + macroId);
         },
         
         /**
@@ -1589,7 +1590,11 @@ function macroResource($q, $http, umbRequestHelper) {
                         var json = angular.toJson(val);
                         //then we need to url encode it so that it's safe
                         val = encodeURIComponent(json);
-                    }                    
+                    }
+                    else {
+                        //we still need to encode the string, it could contain line breaks, etc...
+                        val = encodeURIComponent(val);
+                    }
 
                     query += "&macroParams[" + counter + "].key=" + key + "&macroParams[" + counter + "].value=" + val;
                     counter++;
@@ -1602,7 +1607,7 @@ function macroResource($q, $http, umbRequestHelper) {
                        "macroApiBaseUrl",
                        "GetMacroResultAsHtmlForEditor",
                        query)),
-               'Failed to retreive macro result for macro with alias  ' + macroAlias);
+               'Failed to retrieve macro result for macro with alias  ' + macroAlias);
         }
             
     };
@@ -1749,7 +1754,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "mediaApiBaseUrl",
                        "GetById",
                        [{ id: id }])),
-               'Failed to retreive data for media id ' + id);
+               'Failed to retrieve data for media id ' + id);
         },
 
         /**
@@ -1816,7 +1821,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "mediaApiBaseUrl",
                        "GetByIds",
                        idQuery)),
-               'Failed to retreive data for media ids ' + ids);
+               'Failed to retrieve data for media ids ' + ids);
         },
 
         /**
@@ -1859,7 +1864,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "mediaApiBaseUrl",
                        "GetEmpty",
                        [{ contentTypeAlias: alias }, { parentId: parentId }])),
-               'Failed to retreive data for empty media item type ' + alias);
+               'Failed to retrieve data for empty media item type ' + alias);
 
         },
 
@@ -1870,7 +1875,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "mediaApiBaseUrl",
                        "GetRootMedia")),
-               'Failed to retreive data for root media');
+               'Failed to retrieve data for root media');
 
         },
 
@@ -1938,7 +1943,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                            { orderDirection: options.orderDirection },
                            { filter: options.filter }
                        ])),
-               'Failed to retreive children for media item ' + parentId);
+               'Failed to retrieve children for media item ' + parentId);
         },
         
         /**
@@ -2073,12 +2078,13 @@ function mediaTypeResource($q, $http, umbRequestHelper) {
                        "mediaTypeApiBaseUrl",
                        "GetAllowedChildren",
                        [{ contentId: mediaId }])),
-               'Failed to retreive data for media id ' + mediaId);
+               'Failed to retrieve data for media id ' + mediaId);
         }
 
     };
 }
 angular.module('umbraco.resources').factory('mediaTypeResource', mediaTypeResource);
+
 /**
     * @ngdoc service
     * @name umbraco.resources.memberResource
@@ -2134,7 +2140,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "memberApiBaseUrl",
                        "GetByKey",
                        [{ key: key }])),
-               'Failed to retreive data for member id ' + key);
+               'Failed to retrieve data for member id ' + key);
         },
 
         /**
@@ -2206,7 +2212,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
                             "memberApiBaseUrl",
                             "GetEmpty",
                             [{ contentTypeAlias: alias }])),
-                    'Failed to retreive data for empty member item type ' + alias);
+                    'Failed to retrieve data for empty member item type ' + alias);
             }
             else {
                 return umbRequestHelper.resourcePromise(
@@ -2272,12 +2278,13 @@ function memberTypeResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "memberTypeApiBaseUrl",
                        "GetAllTypes")),
-               'Failed to retreive data for member types id');
+               'Failed to retrieve data for member types id');
         }
 
     };
 }
 angular.module('umbraco.resources').factory('memberTypeResource', memberTypeResource);
+
 /**
     * @ngdoc service
     * @name umbraco.resources.sectionResource
@@ -2300,7 +2307,7 @@ function sectionResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "sectionApiBaseUrl",
                        "GetSections")),
-               'Failed to retreive data for sections');
+               'Failed to retrieve data for sections');
 
 		}
     };
@@ -2345,7 +2352,7 @@ function stylesheetResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "stylesheetApiBaseUrl",
                        "GetAll")),
-               'Failed to retreive stylesheets ');
+               'Failed to retrieve stylesheets ');
         },
 
         /**
@@ -2373,8 +2380,8 @@ function stylesheetResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "stylesheetApiBaseUrl",
                        "GetRules",
-                       [{ id: id }]) +"&rnd=" + Math.floor(Math.random()*1001), {cache: false}),
-               'Failed to retreive stylesheets ');
+                       [{ id: id }])),
+               'Failed to retrieve stylesheets ');
         },
 
         /**
@@ -2402,7 +2409,7 @@ function stylesheetResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "stylesheetApiBaseUrl",
                        "GetRulesByName",
-                       [{ name: name }]) +"&rnd=" + Math.floor(Math.random()*1001), {cache: false}),
+                       [{ name: name }])),
                'Failed to retreive stylesheets ');
         }
     };
@@ -2441,7 +2448,7 @@ function treeResource($q, $http, umbRequestHelper) {
               
             return umbRequestHelper.resourcePromise(
                 $http.get(getTreeMenuUrl(node)),
-                "Failed to retreive data for a node's menu " + node.id);
+                "Failed to retrieve data for a node's menu " + node.id);
         },
 
         /** Loads in the data to display the nodes for an application */
@@ -2472,7 +2479,7 @@ function treeResource($q, $http, umbRequestHelper) {
                         "treeApplicationApiBaseUrl",
                         "GetApplicationTrees",
                             query)),
-                'Failed to retreive data for application tree ' + options.section);
+                'Failed to retrieve data for application tree ' + options.section);
         },
         
         /** Loads in the data to display the child nodes for a given node */
@@ -2490,5 +2497,6 @@ function treeResource($q, $http, umbRequestHelper) {
 }
 
 angular.module('umbraco.resources').factory('treeResource', treeResource);
+
 
 })();

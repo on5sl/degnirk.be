@@ -1,4 +1,4 @@
-/*! umbraco - v7.0.0-Beta - 2014-02-17
+/*! umbraco - v7.0.0-Beta - 2014-04-08
  * https://github.com/umbraco/umbraco-cms/tree/7.0.0
  * Copyright (c) 2014 Umbraco HQ;
  * Licensed MIT
@@ -11,103 +11,54 @@ angular.module("umbraco.directives.editors", []);
 angular.module("umbraco.directives.html", []);
 angular.module("umbraco.directives.validation", []);
 /**
- * @ngdoc directive
- * @name umbraco.directives.directive:autoScale
- * @element div
- * @function
- *
- * @description
- * Resize div's automatically to fit to the bottom of the screen, as an optional parameter an y-axis offset can be set
- * So if you only want to scale the div to 70 pixels from the bottom you pass "70"
- *
- * @example
-   <example module="umbraco.directives">
-     <file name="index.html">
-         <div auto-scale="70" class="input-block-level"></div>
-     </file>
-   </example>
- */
+* @ngdoc directive
+* @name umbraco.directives.directive:umbProperty
+* @restrict E
+**/
 angular.module("umbraco.directives")
-  .directive('autoScale', function ($window) {
-    return function (scope, el, attrs) {
+    .directive('buttonGroup', function (contentEditingHelper) {
+        return {
+            scope: {
+                actions: "=",
+                handler: "="
+            },
+            transclude: true,
+            restrict: 'E',
+            replace: true,        
+            templateUrl: 'views/directives/button-group.html',
+            link: function (scope, element, attrs, ctrl) {
 
-      var totalOffset = 0;
-      var offsety = parseInt(attrs.autoScale, 10);
-      var window = angular.element($window);
-      if (offsety !== undefined){
-        totalOffset += offsety;
-      }
+                scope.buttons = [];
 
-      setTimeout(function () {
-        el.height(window.height() - (el.offset().top + totalOffset));
-      }, 500);
+                scope.handle = function(action){
+                    if(scope.handler){
+                        
+                    }
+                };
+                function processActions() {
+                    var buttons = [];
 
-      window.bind("resize", function () {
-        el.height(window.height() - (el.offset().top + totalOffset));
-      });
+                    angular.forEach(scope.actions, function(action){
+                        if(angular.isObject(action)){
+                            buttons.push(action);
+                        }else{
+                            var btn  = contentEditingHelper.getButtonFromAction(action);
+                            if(btn){
+                                buttons.push(btn);
+                            }
+                        }
+                    });
 
-    };
-  });
-angular.module('umbraco.directives.editors').directive('ace', function(assetsService) {
-  var ACE_EDITOR_CLASS = 'ace-editor';
-
-  function loadAceEditor(element, mode) {
-    assetsService.loadJs("lib/ace/noconflict/ace.js").then(function(){
-        var editor = ace.edit($(element).find('.' + ACE_EDITOR_CLASS)[0]);
-        editor.session.setMode("ace/mode/" + mode);
-        editor.renderer.setShowPrintMargin(false);
-        return editor;
+                    scope.defaultButton = buttons.pop(0);
+                    scope.buttons = buttons;
+                }
+                
+                scope.$watchCollection(scope.actions, function(){
+                    processActions();
+                });
+            }
+        };
     });
-  }
-
-  function valid(editor) {
-    return (Object.keys(editor.getSession().getAnnotations()).length === 0);
-  }
-
-  return {
-    restrict: 'A',
-    require: '?ngModel',
-    transclude: true,
-    template: '<div class="transcluded" ng-transclude></div><div class="' + ACE_EDITOR_CLASS + '"></div>',
-
-    link: function(scope, element, attrs, ngModel) {
-      function read() {
-        ngModel.$setViewValue(editor.getValue());
-        textarea.val(editor.getValue());
-      }
-
-      var textarea = $(element).find('textarea');
-      textarea.hide();
-
-      var mode = attrs.ace;
-      var editor = loadAceEditor(element, mode);
-      scope.ace = editor;
-
-      if (!ngModel)
-      {
-        return; // do nothing if no ngModel
-      }
-
-      ngModel.$render = function() {
-        var value = ngModel.$viewValue || '';
-        editor.getSession().setValue(value);
-        textarea.val(value);
-      };
-
-      editor.getSession().on('changeAnnotation', function() {
-        if (valid(editor)) {
-          scope.$apply(read);
-        }
-      });
-
-      editor.getSession().setValue(textarea.val());
-
-      read();
-
-    }
-  };
-});
-
 /**
 * @ngdoc directive
 * @name umbraco.directives.directive:umbContentName 
@@ -159,6 +110,39 @@ angular.module("umbraco.directives")
 			}
 	    };
 	});
+/**
+* @ngdoc directive
+* @name umbraco.directives.directive:umbFileUpload
+* @function
+* @restrict A
+* @scope
+* @description
+*  A single file upload field that will reset itself based on the object passed in for the rebuild parameter. This
+*  is required because the only way to reset an upload control is to replace it's html.
+**/
+function umbSingleFileUpload($compile) {
+    return {
+        restrict: "E",
+        scope: {
+            rebuild: "="
+        },
+        replace: true,
+        template: "<div><input type='file' umb-file-upload /></div>",
+        link: function (scope, el, attrs) {
+
+            scope.$watch("rebuild", function (newVal, oldVal) {
+                if (newVal && newVal !== oldVal) {
+                    //recompile it!
+                    el.html("<input type='file' umb-file-upload />");
+                    $compile(el.contents())(scope);
+                }
+            });
+
+        }
+    };
+}
+
+angular.module('umbraco.directives').directive("umbSingleFileUpload", umbSingleFileUpload);
 /**
  * @ngdoc directive
  * @name umbraco.directives.directive:umbSort
@@ -330,66 +314,6 @@ angular.module("umbraco.directives")
 
 /**
 * @ngdoc directive
-* @name umbraco.directives.directive:fixNumber
-* @restrict A
-* @description Used in conjunction with type='number' input fields to ensure that the bound value is converted to a number when using ng-model
-*  because normally it thinks it's a string and also validation doesn't work correctly due to an angular bug.
-**/
-function fixNumber() {
-    return {
-        restrict: "A",
-        require: "ngModel",
-        link: function (scope, element, attr, ngModel) {
-
-            //This fixes the issue of when your model contains a number as a string (i.e. "1" instead of 1)
-            // which will not actually work on initial load and the browser will say you have an invalid number 
-            // entered. So if it parses to a number, we call setViewValue which sets the bound model value
-            // to the real number. It should in theory update the view but it doesn't so we need to manually set
-            // the element's value. I'm sure there's a bug logged for this somewhere for angular too.
-
-            var modelVal = scope.$eval(attr.ngModel);
-            if (modelVal) {
-                var asNum = parseFloat(modelVal, 10);
-                if (!isNaN(asNum)) {                    
-                    ngModel.$setViewValue(asNum);
-                    element.val(asNum);
-                }
-                else {                    
-                    ngModel.$setViewValue(null);
-                    element.val("");
-                }
-            }
-            
-            ngModel.$formatters.push(function (value) {
-                if (angular.isString(value)) {
-                    return parseFloat(value);
-                }
-                return value;
-            });
-            
-            //This fixes this angular issue: 
-            //https://github.com/angular/angular.js/issues/2144
-            // which doesn't actually validate the number input properly since the model only changes when a real number is entered
-            // but the input box still allows non-numbers to be entered which do not validate (only via html5)
-            
-            if (typeof element.prop('validity') === 'undefined') {
-                return;
-            }
-
-            element.bind('input', function (e) {
-                var validity = element.prop('validity');
-                scope.$apply(function () {
-                    ngModel.$setValidity('number', !validity.badInput);
-                });
-            });
-
-        }
-    };
-}
-angular.module('umbraco.directives').directive("fixNumber", fixNumber);
-
-/**
-* @ngdoc directive
 * @name umbraco.directives.directive:hexBgColor
 * @restrict A
 * @description Used to set a hex background color on an element, this will detect valid hex and when it is valid it will set the color, otherwise
@@ -412,9 +336,13 @@ function hexBgColor() {
                         //get the orig color before changing it
                         origColor = element.css("border-color");
                     }
-                    //validate it
+                    //validate it - test with and without the leading hash.
                     if (/^([0-9a-f]{3}|[0-9a-f]{6})$/i.test(newVal)) {
                         element.css("background-color", "#" + newVal);
+                        return;
+                    }
+                    if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(newVal)) {
+                        element.css("background-color", newVal);
                         return;
                     }
                 }
@@ -425,33 +353,64 @@ function hexBgColor() {
     };
 }
 angular.module('umbraco.directives').directive("hexBgColor", hexBgColor);
+angular.module("umbraco.directives")
+.directive('sectionIcon', function ($compile, iconHelper) {
+    return {
+        restrict: 'E',
+        replace: true,
+
+        link: function (scope, element, attrs) {
+
+            var icon = attrs.icon;
+
+            if (iconHelper.isLegacyIcon(icon)) {
+                //its a known legacy icon, convert to a new one
+                element.html("<i class='" + iconHelper.convertFromLegacyIcon(icon) + "'></i>");
+            }
+            else if (iconHelper.isFileBasedIcon(icon)) {
+                var convert = iconHelper.convertFromLegacyImage(icon);
+                if(convert){
+                    element.html("<i class='icon-section " + convert + "'></i>");
+                }else{
+                    element.html("<img src='images/tray/" + icon + "'>");
+                }
+                //it's a file, normally legacy so look in the icon tray images
+            }
+            else {
+                //it's normal
+                element.html("<i class='icon-section " + icon + "'></i>");
+            }
+        }
+    };
+});
 /**
 * @ngdoc directive
-* @name umbraco.directives.directive:headline
+* @name umbraco.directives.directive:umbAvatar
+* @restrict E
 **/
-angular.module("umbraco.directives")
-  .directive('hotkey', function ($window, keyboardService, $log) {
+function avatarDirective() {
+    return {
+        restrict: "E",    // restrict to an element
+        replace: true,   // replace the html element with the template
+        templateUrl: 'views/directives/umb-avatar.html',
+        scope: {
+            name: '@',
+            email: '@',
+            hash: '@'
+        },
+        link: function(scope, element, attr, ctrl) {
 
-      return function (scope, el, attrs) {
-          
-          //support data binding
-    
-          var keyCombo = scope.$eval(attrs["hotkey"]);
-          if (!keyCombo) {
-              keyCombo = attrs["hotkey"];
-          }
+            scope.$watch("hash", function (val) {
+                //set the gravatar url
+                scope.gravatar = "http://www.gravatar.com/avatar/" + val + "?s=40";
+            });
+            
+        }
+    };
+}
 
-          keyboardService.bind(keyCombo, function() {
-              var element = $(el);
-              if(element.is("a,button,input[type='button'],input[type='submit']")){
-                element.click();
-              }else{
-                element.focus();
-              }
-          });
-          
-      };
-  });
+angular.module('umbraco.directives').directive("umbAvatar", avatarDirective);
+
 /**
 * @ngdoc directive
 * @name umbraco.directives.directive:umbProperty
@@ -490,6 +449,85 @@ angular.module("umbraco.directives.html")
             }
         };
     });
+angular.module("umbraco.directives")
+.directive('umbHeader', function($parse, $timeout){
+    return {
+        restrict: 'E',
+        replace: true,
+        transclude: 'true',
+        templateUrl: 'views/directives/umb-header.html',
+        //create a new isolated scope assigning a tabs property from the attribute 'tabs'
+        //which is bound to the parent scope property passed in
+        scope: {
+            tabs: "="
+        },
+        link: function (scope, iElement, iAttrs) {
+
+            var maxTabs = 4;
+
+            function collectFromDom(activeTab){
+                var $panes = $('div.tab-content');
+                
+                angular.forEach($panes.find('.tab-pane'), function (pane, index) {
+                    var $this = angular.element(pane);
+
+                    var id = $this.attr("rel");
+                    var label = $this.attr("label");
+                    var tab = {id: id, label: label, active: false};
+                    if(!activeTab){
+                        tab.active = true;
+                        activeTab = tab;
+                    }
+
+                    if ($this.attr("rel") === String(activeTab.id)) {
+                        $this.addClass('active');
+                    }
+                    else {
+                        $this.removeClass('active');
+                    }
+                    
+                    if(label){
+                            scope.visibleTabs.push(tab);
+                    }
+
+                });
+            }
+
+            scope.showTabs = iAttrs.tabs ? true : false;
+            scope.visibleTabs = [];
+            scope.overflownTabs = [];
+
+            $timeout(function () {
+                collectFromDom(undefined);
+            }, 500);
+
+            //when the tabs change, we need to hack the planet a bit and force the first tab content to be active,
+            //unfortunately twitter bootstrap tabs is not playing perfectly with angular.
+            scope.$watch("tabs", function (newValue, oldValue) {
+
+                angular.forEach(newValue, function(val, index){
+                        var tab = {id: val.id, label: val.label};
+                        scope.visibleTabs.push(tab);
+                });
+                
+                //don't process if we cannot or have already done so
+                if (!newValue) {return;}
+                if (!newValue.length || newValue.length === 0){return;}
+                
+                var activeTab = _.find(newValue, function (item) {
+                    return item.active;
+                });
+
+                //we need to do a timeout here so that the current sync operation can complete
+                // and update the UI, then this will fire and the UI elements will be available.
+                $timeout(function () {
+                    collectFromDom(activeTab);
+                }, 500);
+                
+            });
+        }
+    };
+});
 /**
 * @ngdoc directive
 * @name umbraco.directives.directive:umbProperty
@@ -510,60 +548,12 @@ angular.module("umbraco.directives.html")
 * @restrict E
 **/
 angular.module("umbraco.directives.html")
-	.directive('umbPanel', function($timeout){
+	.directive('umbPanel', function($timeout, $log){
 		return {
 			restrict: 'E',
 			replace: true,
 			transclude: 'true',
-			templateUrl: 'views/directives/html/umb-panel.html',
-			link: function (scope, el, attrs) {
-				
-				function _setClass(resize){
-					var bar = $(".tab-content .active .umb-tab-buttons");
-
-					//incase this runs without any tabs
-					if(bar.length === 0){
-						bar = $(".tab-content .umb-tab-buttons");
-					}
-
-					//no need to process
-					if(resize){
-						bar.removeClass("umb-bottom-bar");
-					}	
-
-					//already positioned
-					if(bar.hasClass("umb-bottom-bar")){
-						return;
-					}
-
-					var offset = bar.offset();
-
-					if(offset){
-						var bottom = bar.offset().top + bar.height();
-			            if(bottom > $(window).height()){
-							bar.addClass("umb-bottom-bar");
-							$(".tab-content .active").addClass("with-buttons");
-						}else{
-							bar.removeClass("umb-bottom-bar");
-							$(".tab-content .active").removeClass("with-buttons");
-						}	
-					}
-				}
-
-
-				//initial loading
-				$timeout(function(){
-					$('a[data-toggle="tab"]').on('shown', function (e) {
-						_setClass();	
-					});
-					_setClass();
-				}, 1000, false);
-				
-				
-				$(window).bind("resize", function () {
-				  _setClass(true);
-				});	
-			}
+			templateUrl: 'views/directives/html/umb-panel.html'
 		};
 	});
 /**
@@ -582,6 +572,8 @@ angular.module("umbraco.directives.html")
             templateUrl: 'views/directives/html/umb-photo-folder.html',
             link: function(scope, element, attrs, ngModel) {
 
+                var lastWatch = null;
+
                 ngModel.$render = function() {
                     if (ngModel.$modelValue) {
 
@@ -590,9 +582,10 @@ angular.module("umbraco.directives.html")
 
                             scope.clickHandler = scope.$eval(element.attr('on-click'));
 
-                            //todo: this doesn't do anything
-                            var imagesOnly = element.attr('imagesOnly');
-
+                            
+                            var imagesOnly =  element.attr('images-only') === "true";
+                           
+                            
                             var margin = element.attr('border') ? parseInt(element.attr('border'), 10) : 5;
                             var startingIndex = element.attr('baseline') ? parseInt(element.attr('baseline'), 10) : 0;
                             var minWidth = element.attr('min-width') ? parseInt(element.attr('min-width'), 10) : 420;
@@ -602,14 +595,22 @@ angular.module("umbraco.directives.html")
                             var fixedRowWidth = Math.max(element.width(), minWidth);
 
                             scope.containerStyle = { width: fixedRowWidth + "px" };
-                            scope.rows = umbPhotoFolderHelper.buildGrid(photos, fixedRowWidth, maxHeight, startingIndex, minHeight, idealImgPerRow, margin);
+                            scope.rows = umbPhotoFolderHelper.buildGrid(photos, fixedRowWidth, maxHeight, startingIndex, minHeight, idealImgPerRow, margin, imagesOnly);
 
                             if (attrs.filterBy) {
-                                scope.$watch(attrs.filterBy, function(newVal, oldVal) {
+
+                                //we track the watches that we create, we don't want to create multiple, so clear it
+                                // if it already exists before creating another.
+                                if (lastWatch) {
+                                    lastWatch();
+                                }
+
+                                //TODO: Need to debounce this so it doesn't filter too often!
+                                lastWatch = scope.$watch(attrs.filterBy, function (newVal, oldVal) {
                                     if (newVal && newVal !== oldVal) {
                                         var p = $filter('filter')(photos, newVal, false);
                                         scope.baseline = 0;
-                                        var m = umbPhotoFolderHelper.buildGrid(p, fixedRowWidth, maxHeight, startingIndex, minHeight, idealImgPerRow, margin);
+                                        var m = umbPhotoFolderHelper.buildGrid(p, fixedRowWidth, maxHeight, startingIndex, minHeight, idealImgPerRow, margin, imagesOnly);
                                         scope.rows = m;
                                     }
                                 });
@@ -623,6 +624,34 @@ angular.module("umbraco.directives.html")
         };
     });
 
+/**
+* @ngdoc directive
+* @name umbraco.directives.directive:umbTab 
+* @restrict E
+**/
+angular.module("umbraco.directives")
+.directive('umbTab', function(){
+	return {
+		restrict: 'E',
+		replace: true,
+		transclude: 'true',
+		templateUrl: 'views/directives/umb-tab.html'
+	};
+});
+/**
+* @ngdoc directive
+* @name umbraco.directives.directive:umbTabView 
+* @restrict E
+**/
+angular.module("umbraco.directives")
+.directive('umbTabView', function($timeout, $log){
+	return {
+		restrict: 'E',
+		replace: true,
+		transclude: 'true',
+		templateUrl: 'views/directives/umb-tab-view.html'
+	};
+});
 /**
 * @ngdoc directive
 * @name umbraco.directives.directive:umbPanel
@@ -641,140 +670,487 @@ angular.module("umbraco.directives.html")
 			templateUrl: 'views/directives/html/umb-upload-dropzone.html'
 		};
 	});
-angular.module("umbraco.directives")
-.directive('localize', function ($log, localizationService) {
-    return {
-        restrict: 'E',
-        scope:{
-            key: '@'
-        },
-        replace: true,
-        link: function (scope, element, attrs) {
-            var key = scope.key;
-            localizationService.localize(key).then(function(value){
-                element.html(value);
-            });
-        }
-    };
-})
-.directive('localize', function ($log, localizationService) {
-    return {
-        restrict: 'A',
-        link: function (scope, element, attrs) {
-            var keys = attrs.localize.split(',');
-
-            angular.forEach(keys, function(value, key){
-                var attr = element.attr(value);
-                if(attr){
-                    if(attr[0] === '@'){
-                        var t = localizationService.tokenize(attr.substring(1), scope);
-                        localizationService.localize(t.key, t.tokens).then(function(val){
-                                element.attr(value, val);
-                        });
-                    }
-                }
-            });
-
-        }
-    };
-});
 /**
 * @ngdoc directive
-* @name umbraco.directives.directive:preventDefault
+* @name umbraco.directives.directive:umbImageCrop
+* @restrict E
+* @function
 **/
 angular.module("umbraco.directives")
-    .directive('preventDefault', function() {
-        return function(scope, element, attrs) {
+	.directive('umbImageCrop', 
+		function ($timeout, localizationService, cropperHelper,  $log) {
+	    return {
+				restrict: 'E',
+				replace: true,
+				templateUrl: 'views/directives/imaging/umb-image-crop.html',
+				scope: {
+					src: '=',
+					width: '@',
+					height: '@',
+					crop: "=",
+					center: "=",
+					maxSize: '@'
+				},
 
-            var enabled = true;
-            //check if there's a value for the attribute, if there is and it's false then we conditionally don't 
-            //prevent default.
-            if (attrs.preventDefault) {
-                attrs.$observe("preventDefault", function (newVal) {
-                    enabled = (newVal === "false" || newVal === 0 || newVal === false) ? false : true;
-                });
-            }
+				link: function(scope, element, attrs) {
+					scope.width = 400;
+					scope.height = 320;
 
-            $(element).click(function (event) {
-                if (event.metaKey || event.ctrlKey) {
-                    return;
-                }
-                else {
-                    if (enabled === true) {
-                        event.preventDefault();
-                    }
-                }
-            });
-        };
-    });
+					scope.dimensions = {
+						image: {},
+						cropper:{},
+						viewport:{},
+						margin: 20,
+						scale: {
+							min: 0.3,
+							max: 3,
+							current: 1
+						}
+					};
+
+
+					//live rendering of viewport and image styles
+					scope.style = function () {
+						return { 
+							'height': (parseInt(scope.dimensions.viewport.height, 10)) + 'px',
+							'width': (parseInt(scope.dimensions.viewport.width, 10)) + 'px' 
+						};
+					};
+				
+
+					//elements
+					var $viewport = element.find(".viewport"); 
+					var $image = element.find("img");
+					var $overlay = element.find(".overlay");
+					var $container = element.find(".crop-container");
+
+					//default constraints for drag n drop
+					var constraints = {left: {max: scope.dimensions.margin, min: scope.dimensions.margin}, top: {max: scope.dimensions.margin, min: scope.dimensions.margin}, };
+					scope.constraints = constraints;
+
+
+					//set constaints for cropping drag and drop
+					var setConstraints = function(){
+						constraints.left.min = scope.dimensions.margin + scope.dimensions.cropper.width - scope.dimensions.image.width;
+						constraints.top.min = scope.dimensions.margin + scope.dimensions.cropper.height - scope.dimensions.image.height;
+					};
+
+
+					var setDimensions = function(originalImage){	
+						originalImage.width("auto");
+						originalImage.height("auto");
+
+						var image = {};
+						image.originalWidth = originalImage.width();
+						image.originalHeight = originalImage.height();
+
+						image.width = image.originalWidth;
+						image.height = image.originalHeight;
+						image.left = originalImage[0].offsetLeft;
+						image.top = originalImage[0].offsetTop;
+
+						scope.dimensions.image = image;
+
+						//unscaled editor size
+						//var viewPortW =  $viewport.width();
+						//var viewPortH =  $viewport.height();
+						var _viewPortW =  parseInt(scope.width, 10);
+						var _viewPortH =  parseInt(scope.height, 10);
+
+						//if we set a constraint we will scale it down if needed
+						if(scope.maxSize){	
+							var ratioCalculation = cropperHelper.scaleToMaxSize(
+									_viewPortW, 
+									_viewPortH,
+									scope.maxSize);
+
+							//so if we have a max size, override the thumb sizes
+							_viewPortW = ratioCalculation.width;
+							_viewPortH = ratioCalculation.height;	
+						}
+
+						scope.dimensions.viewport.width = _viewPortW + 2 * scope.dimensions.margin;
+						scope.dimensions.viewport.height = _viewPortH + 2 * scope.dimensions.margin;
+						scope.dimensions.cropper.width = _viewPortW; // scope.dimensions.viewport.width - 2 * scope.dimensions.margin;
+						scope.dimensions.cropper.height = _viewPortH; //  scope.dimensions.viewport.height - 2 * scope.dimensions.margin;
+					};
+
+
+					//when loading an image without any crop info, we center and fit it
+					var resizeImageToEditor = function(){
+						//returns size fitting the cropper	
+						var size = cropperHelper.calculateAspectRatioFit(
+								scope.dimensions.image.width, 
+								scope.dimensions.image.height, 
+								scope.dimensions.cropper.width, 
+								scope.dimensions.cropper.height, 
+								true);
+
+						//sets the image size and updates the scope
+						scope.dimensions.image.width = size.width;
+						scope.dimensions.image.height = size.height;
+
+						//calculate the best suited ratios
+						scope.dimensions.scale.min = size.ratio;
+						scope.dimensions.scale.max = 2;
+						scope.dimensions.scale.current = size.ratio;
+
+						//center the image
+						var position = cropperHelper.centerInsideViewPort(scope.dimensions.image, scope.dimensions.cropper);
+						scope.dimensions.top = position.top;
+						scope.dimensions.left = position.left;
+
+						setConstraints();
+					};
+
+					//resize to a given ratio
+					var resizeImageToScale = function(ratio){
+						//do stuff
+						var size = cropperHelper.calculateSizeToRatio(scope.dimensions.image.originalWidth, scope.dimensions.image.originalHeight, ratio);
+						scope.dimensions.image.width = size.width;
+						scope.dimensions.image.height = size.height;
+
+						setConstraints();
+						validatePosition(scope.dimensions.image.left, scope.dimensions.image.top);
+					};
+
+					//resize the image to a predefined crop coordinate
+					var resizeImageToCrop = function(){
+						scope.dimensions.image = cropperHelper.convertToStyle(
+												scope.crop, 
+												{width: scope.dimensions.image.originalWidth, height: scope.dimensions.image.originalHeight},
+												scope.dimensions.cropper,
+												scope.dimensions.margin);
+
+						var ratioCalculation = cropperHelper.calculateAspectRatioFit(
+								scope.dimensions.image.originalWidth, 
+								scope.dimensions.image.originalHeight, 
+								scope.dimensions.cropper.width, 
+								scope.dimensions.cropper.height, 
+								true);
+
+						scope.dimensions.scale.current = scope.dimensions.image.ratio;
+
+						//min max based on original width/height
+						scope.dimensions.scale.min = ratioCalculation.ratio;
+						scope.dimensions.scale.max = 2;
+					};
+
+
+
+					var validatePosition = function(left, top){
+						if(left > constraints.left.max)
+						{
+							left = constraints.left.max; 
+						}
+
+						if(left <= constraints.left.min){
+							left = constraints.left.min;
+						}
+
+						if(top > constraints.top.max)
+						{
+							top = constraints.top.max; 
+						}
+						if(top <= constraints.top.min){
+							top = constraints.top.min;
+						}
+
+						if(scope.dimensions.image.left !== left){
+							scope.dimensions.image.left = left;
+						}	
+						
+						if(scope.dimensions.image.top !== top){
+							scope.dimensions.image.top = top;
+						}
+					};	
+
+
+					//sets scope.crop to the recalculated % based crop	
+					var calculateCropBox = function(){
+						scope.crop = cropperHelper.pixelsToCoordinates(scope.dimensions.image, scope.dimensions.cropper.width, scope.dimensions.cropper.height, scope.dimensions.margin);	
+					};
+
+
+					//Drag and drop positioning, using jquery ui draggable
+					var onStartDragPosition, top, left;
+					$overlay.draggable({
+						drag: function(event, ui) {
+							scope.$apply(function(){
+								validatePosition(ui.position.left, ui.position.top);
+							});
+						},
+						stop: function(event, ui){
+							scope.$apply(function(){
+								//make sure that every validates one more time...
+								validatePosition(ui.position.left, ui.position.top);
+
+								calculateCropBox();
+								scope.dimensions.image.rnd = Math.random();
+							});
+						}
+					});
+					
+
+
+					var init = function(image){
+						scope.loaded = false;
+
+						//set dimensions on image, viewport, cropper etc
+						setDimensions(image);
+
+						//if we have a crop already position the image
+						if(scope.crop){
+							resizeImageToCrop();
+						}else{
+							resizeImageToEditor();
+						}
+
+						//sets constaints for the cropper
+						setConstraints();
+						scope.loaded = true;
+					};
+
+
+					/// WATCHERS ////
+					scope.$watchCollection('[width, height]', function(newValues, oldValues){
+							//we have to reinit the whole thing if
+							//one of the external params changes
+							if(newValues !== oldValues){
+								setDimensions($image);
+								setConstraints();
+							}
+					});
+
+					var throttledResizing = _.throttle(function(){
+						resizeImageToScale(scope.dimensions.scale.current);
+						calculateCropBox();	
+					}, 100);
+
+					
+					//happens when we change the scale
+					scope.$watch("dimensions.scale.current", function(){
+						if(scope.loaded){
+							throttledResizing();
+						}
+					});
+
+					//ie hack
+					if(window.navigator.userAgent.indexOf("MSIE ")){
+						var ranger = element.find("input");
+						ranger.bind("change",function(){
+							scope.$apply(function(){
+								scope.dimensions.scale.current = ranger.val();
+							});
+						});	
+					}
+					
+					//// INIT /////
+					$image.load(function(){
+						$timeout(function(){
+							init($image);
+						});
+					});
+				}
+			};
+		});
 /**
- * @ngdoc directive
- * @name umbraco.directives.directive:resizeToContent
- * @element div
- * @function
- *
- * @description
- * Resize iframe's automatically to fit to the content they contain
- *
- * @example
-   <example module="umbraco.directives">
-     <file name="index.html">
-         <iframe resize-to-content src="meh.html"></iframe>
-     </file>
-   </example>
- */
+* @ngdoc directive
+* @name umbraco.directives.directive:umbCropsy
+* @restrict E
+* @function
+* @description 
+* Used by editors that require naming an entity. Shows a textbox/headline with a required validator within it's own form.
+**/
 angular.module("umbraco.directives")
-  .directive('resizeToContent', function ($window, $timeout) {
-    return function (scope, el, attrs) {
-       var iframe = el[0];
-       var iframeWin = iframe.contentWindow || iframe.contentDocument.parentWindow;
-       if (iframeWin.document.body) {
+	.directive('umbImageGravity', function ($timeout, localizationService, $log) {
+	    return {
+				restrict: 'E',
+				replace: true,
+				templateUrl: 'views/directives/imaging/umb-image-gravity.html',
+				scope: {
+					src: '=',
+					center: "="
+				},
+				link: function(scope, element, attrs) {
+					
+					//Internal values for keeping track of the dot and the size of the editor
+					scope.dimensions = {
+						width: 0,
+						height: 0,
+						left: 0,
+						top: 0
+					};
 
-          $timeout(function(){
-              var height = iframeWin.document.documentElement.scrollHeight || iframeWin.document.body.scrollHeight;
-              el.height(height);
-          }, 3000);
-       }
-    };
-  });
+					//elements
+					var $viewport = element.find(".viewport"); 
+					var $image = element.find("img");
+					var $overlay = element.find(".overlay");
+					
+					scope.style = function () {
+						if(scope.dimensions.width <= 0){
+							setDimensions();
+						}
+
+						return {
+							'top': scope.dimensions.top + 'px',
+							'left': scope.dimensions.left + 'px' 
+						};
+					};
+
+					var setDimensions = function(){
+						scope.dimensions.width = $image.width();
+						scope.dimensions.height = $image.height();
+
+						if(scope.center){
+							scope.dimensions.left =  scope.center.left * scope.dimensions.width -10;
+							scope.dimensions.top =  scope.center.top * scope.dimensions.height -10;
+						}
+					};	
+
+					var calculateGravity = function(){
+						scope.dimensions.left = $overlay[0].offsetLeft;
+						scope.dimensions.top =  $overlay[0].offsetTop;
+
+						scope.center.left =  (scope.dimensions.left+10) / scope.dimensions.width;
+						scope.center.top =  (scope.dimensions.top+10) / scope.dimensions.height;
+					};
+					
+					var lazyEndEvent = _.debounce(function(){
+						scope.$apply(function(){
+							scope.$emit("imageFocalPointStop");
+						});
+					}, 2000);
+					
+
+					//Drag and drop positioning, using jquery ui draggable
+					//TODO ensure that the point doesnt go outside the box
+					$overlay.draggable({
+						containment: "parent",
+						start: function(){
+							scope.$apply(function(){
+								scope.$emit("imageFocalPointStart");
+							});
+						},
+						stop: function() {
+							scope.$apply(function(){
+								calculateGravity();
+							});
+
+							lazyEndEvent();
+						}
+					});
+
+					//// INIT /////
+					$image.load(function(){
+						$timeout(function(){
+							setDimensions();
+						});
+					});
+				}
+			};
+		});
+/**
+* @ngdoc directive
+* @name umbraco.directives.directive:umbCropsy
+* @restrict E
+* @function
+* @description 
+* Used by editors that require naming an entity. Shows a textbox/headline with a required validator within it's own form.
+**/
 angular.module("umbraco.directives")
-.directive('sectionIcon', function ($compile, iconHelper) {
-    return {
-        restrict: 'E',
-        replace: true,
+	.directive('umbImageThumbnail', 
+		function ($timeout, localizationService, cropperHelper, $log) {
+	    return {
+				restrict: 'E',
+				replace: true,
+				templateUrl: 'views/directives/imaging/umb-image-thumbnail.html',
+				
+				scope: {
+					src: '=',
+					width: '@',
+					height: '@',
+					center: "=",
+					crop: "=",
+					maxSize: '@'
+				},
+				
+				link: function(scope, element, attrs) {
+					//// INIT /////
+					var $image = element.find("img");
 
-        link: function (scope, element, attrs) {
+					$image.load(function(){
+						$timeout(function(){
+							$image.width("auto");
+							$image.height("auto");
 
-            var icon = attrs.icon;
+							scope.image = {};
+							scope.image.width = $image[0].width;
+							scope.image.height = $image[0].height;
 
-            if (iconHelper.isLegacyIcon(icon)) {
-                //its a known legacy icon, convert to a new one
-                element.html("<i class='" + iconHelper.convertFromLegacyIcon(icon) + "'></i>");
-            }
-            else if (iconHelper.isFileBasedIcon(icon)) {
-                var convert = iconHelper.convertFromLegacyImage(icon);
-                if(convert){
-                    element.html("<i class='icon-section " + convert + "'></i>");
-                }else{
-                    element.html("<img src='images/tray/" + icon + "'>");
-                }
-                //it's a file, normally legacy so look in the icon tray images
-            }
-            else {
-                //it's normal
-                element.html("<i class='icon-section " + icon + "'></i>");
-            }
-        }
-    };
-});
-angular.module("umbraco.directives")
-  .directive('selectOnFocus', function () {
-    return function (scope, el, attrs) {
-        $(el).bind("click", function(){
-          this.select();
-        });
-    };
-  });
+							//we force a lower thumbnail size to fit the max size
+							//we do not compare to the image dimensions, but the thumbs
+							if(scope.maxSize){
+								var ratioCalculation = cropperHelper.calculateAspectRatioFit(
+										scope.width, 
+										scope.height,
+										scope.maxSize, 
+										scope.maxSize, 
+										true);
+
+								//so if we have a max size, override the thumb sizes
+								scope.width = ratioCalculation.width;
+								scope.height = ratioCalculation.height;
+							}
+
+							setPreviewStyle();	
+						});
+					});
+
+					/// WATCHERS ////
+					scope.$watchCollection('[crop, center]', function(newValues, oldValues){
+							//we have to reinit the whole thing if
+							//one of the external params changes
+							setPreviewStyle();
+					});
+
+					scope.$watch("center", function(){
+						setPreviewStyle();
+					}, true);
+					
+					function setPreviewStyle(){
+						if(scope.crop && scope.image){
+							scope.preview = cropperHelper.convertToStyle(
+												scope.crop, 
+												scope.image,
+												{width: scope.width, height: scope.height},
+												0);
+						}else if(scope.image){
+
+							//returns size fitting the cropper	
+							var p = cropperHelper.calculateAspectRatioFit(
+									scope.image.width, 
+									scope.image.height, 
+									scope.width, 
+									scope.height, 
+									true);
+
+
+							if(scope.center){
+								var xy = cropperHelper.alignToCoordinates(p, scope.center, {width: scope.width, height: scope.height});
+								p.top = xy.top;
+								p.left = xy.left;
+							}else{
+
+							}
+
+							p.position = "absolute";
+							scope.preview = p;
+						}
+					}
+				}
+			};
+		});
 /**
 * @ngdoc directive
 * @name umbraco.directives.directive:umbItemSorter
@@ -841,34 +1217,6 @@ function umbItemSorter(angularHelper) {
 }
 
 angular.module('umbraco.directives').directive("umbItemSorter", umbItemSorter);
-
-/**
-* @ngdoc directive
-* @name umbraco.directives.directive:umbAvatar
-* @restrict E
-**/
-function avatarDirective() {
-    return {
-        restrict: "E",    // restrict to an element
-        replace: true,   // replace the html element with the template
-        templateUrl: 'views/directives/umb-avatar.html',
-        scope: {
-            name: '@',
-            email: '@',
-            hash: '@'
-        },
-        link: function(scope, element, attr, ctrl) {
-
-            scope.$watch("hash", function (val) {
-                //set the gravatar url
-                scope.gravatar = "http://www.gravatar.com/avatar/" + val + "?s=40";
-            });
-            
-        }
-    };
-}
-
-angular.module('umbraco.directives').directive("umbAvatar", avatarDirective);
 
 /**
  * @ngdoc directive
@@ -974,85 +1322,6 @@ function umbFileUpload() {
 }
 
 angular.module('umbraco.directives').directive("umbFileUpload", umbFileUpload);
-angular.module("umbraco.directives")
-.directive('umbHeader', function($parse, $timeout){
-    return {
-        restrict: 'E',
-        replace: true,
-        transclude: 'true',
-        templateUrl: 'views/directives/umb-header.html',
-        //create a new isolated scope assigning a tabs property from the attribute 'tabs'
-        //which is bound to the parent scope property passed in
-        scope: {
-            tabs: "="
-        },
-        link: function (scope, iElement, iAttrs) {
-
-            var maxTabs = 4;
-
-            function collectFromDom(activeTab){
-                var $panes = $('div.tab-content');
-                
-                angular.forEach($panes.find('.tab-pane'), function (pane, index) {
-                    var $this = angular.element(pane);
-
-                    var id = $this.attr("rel");
-                    var label = $this.attr("label");
-                    var tab = {id: id, label: label, active: false};
-                    if(!activeTab){
-                        tab.active = true;
-                        activeTab = tab;
-                    }
-
-                    if ($this.attr("rel") === String(activeTab.id)) {
-                        $this.addClass('active');
-                    }
-                    else {
-                        $this.removeClass('active');
-                    }
-                    
-                    if(label){
-                            scope.visibleTabs.push(tab);
-                    }
-
-                });
-            }
-
-            scope.showTabs = iAttrs.tabs ? true : false;
-            scope.visibleTabs = [];
-            scope.overflownTabs = [];
-
-            $timeout(function () {
-                collectFromDom(undefined);
-            }, 500);
-
-            //when the tabs change, we need to hack the planet a bit and force the first tab content to be active,
-            //unfortunately twitter bootstrap tabs is not playing perfectly with angular.
-            scope.$watch("tabs", function (newValue, oldValue) {
-
-                angular.forEach(newValue, function(val, index){
-                        var tab = {id: val.id, label: val.label};
-                        scope.visibleTabs.push(tab);
-                });
-                
-                //don't process if we cannot or have already done so
-                if (!newValue) {return;}
-                if (!newValue.length || newValue.length === 0){return;}
-                
-                var activeTab = _.find(newValue, function (item) {
-                    return item.active;
-                });
-
-                //we need to do a timeout here so that the current sync operation can complete
-                // and update the UI, then this will fire and the UI elements will be available.
-                $timeout(function () {
-                    collectFromDom(activeTab);
-                }, 500);
-                
-            });
-        }
-    };
-});
 /**
 * @ngdoc directive
 * @name umbraco.directives.directive:login
@@ -1264,67 +1533,6 @@ angular.module('umbraco.directives').directive("umbSections", sectionsDirective)
 
 /**
 * @ngdoc directive
-* @name umbraco.directives.directive:umbFileUpload
-* @function
-* @restrict A
-* @scope
-* @description
-*  A single file upload field that will reset itself based on the object passed in for the rebuild parameter. This
-*  is required because the only way to reset an upload control is to replace it's html.
-**/
-function umbSingleFileUpload($compile) {
-    return {
-        restrict: "E",
-        scope: {
-            rebuild: "="
-        },
-        replace: true,
-        template: "<div><input type='file' umb-file-upload /></div>",
-        link: function (scope, el, attrs) {
-
-            scope.$watch("rebuild", function (newVal, oldVal) {
-                if (newVal && newVal !== oldVal) {
-                    //recompile it!
-                    el.html("<input type='file' umb-file-upload />");
-                    $compile(el.contents())(scope);
-                }
-            });
-
-        }
-    };
-}
-
-angular.module('umbraco.directives').directive("umbSingleFileUpload", umbSingleFileUpload);
-/**
-* @ngdoc directive
-* @name umbraco.directives.directive:umbTab 
-* @restrict E
-**/
-angular.module("umbraco.directives")
-.directive('umbTab', function(){
-	return {
-		restrict: 'E',
-		replace: true,
-		transclude: 'true',
-		templateUrl: 'views/directives/umb-tab.html'
-	};
-});
-/**
-* @ngdoc directive
-* @name umbraco.directives.directive:umbTabView 
-* @restrict E
-**/
-angular.module("umbraco.directives")
-.directive('umbTabView', function($timeout, $log){
-	return {
-		restrict: 'E',
-		replace: true,
-		transclude: 'true',
-		templateUrl: 'views/directives/umb-tab-view.html'
-	};
-});
-/**
-* @ngdoc directive
 * @name umbraco.directives.directive:umbTree
 * @restrict E
 **/
@@ -1502,7 +1710,10 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     function doLoad(tree) {
                         var childrenAndSelf = [tree].concat(tree.children);
                         scope.activeTree = _.find(childrenAndSelf, function (node) {
-                             return node.metaData.treeAlias === treeAlias;
+                            if(node && node.metaData){
+                                return node.metaData.treeAlias === treeAlias;
+                            }
+                            return false;
                         });
                         
                         if (!scope.activeTree) {
@@ -1940,6 +2151,293 @@ angular.module('umbraco.directives')
     };
 });
 /**
+ * @ngdoc directive
+ * @name umbraco.directives.directive:autoScale
+ * @element div
+ * @function
+ *
+ * @description
+ * Resize div's automatically to fit to the bottom of the screen, as an optional parameter an y-axis offset can be set
+ * So if you only want to scale the div to 70 pixels from the bottom you pass "70"
+ *
+ * @example
+   <example module="umbraco.directives">
+     <file name="index.html">
+         <div auto-scale="70" class="input-block-level"></div>
+     </file>
+   </example>
+ */
+angular.module("umbraco.directives")
+  .directive('autoScale', function ($window) {
+    return function (scope, el, attrs) {
+
+      var totalOffset = 0;
+      var offsety = parseInt(attrs.autoScale, 10);
+      var window = angular.element($window);
+      if (offsety !== undefined){
+        totalOffset += offsety;
+      }
+
+      setTimeout(function () {
+        el.height(window.height() - (el.offset().top + totalOffset));
+      }, 500);
+
+      window.bind("resize", function () {
+        el.height(window.height() - (el.offset().top + totalOffset));
+      });
+
+    };
+  });
+/**
+* @ngdoc directive
+* @name umbraco.directives.directive:umbPanel
+* @restrict E
+**/
+angular.module("umbraco.directives.html")
+	.directive('detectFold', function($timeout, $log){
+		return {
+			restrict: 'A',
+			link: function (scope, el, attrs) {
+				
+				var state = false,
+					parent = $(".umb-panel-body"),
+					winHeight = $(window).height(),
+					calculate = _.throttle(function(){
+						if(el && el.is(":visible") && !el.hasClass("umb-bottom-bar")){
+							//var parent = el.parent();
+							var hasOverflow = parent.innerHeight() < parent[0].scrollHeight;
+							//var belowFold = (el.offset().top + el.height()) > winHeight;
+							if(hasOverflow){
+								el.addClass("umb-bottom-bar");
+							}
+						}
+						return state;
+					}, 1000);
+
+				scope.$watch(calculate, function(newVal, oldVal) {
+					if(newVal !== oldVal){
+						if(newVal){
+							el.addClass("umb-bottom-bar");
+						}else{
+							el.removeClass("umb-bottom-bar");
+						}	
+					}
+				});
+
+				$(window).bind("resize", function () {
+				   winHeight = $(window).height();
+				   el.removeClass("umb-bottom-bar");
+				   state = false;
+				   calculate();
+				});
+
+				$('a[data-toggle="tab"]').on('shown', function (e) {
+					calculate();
+				});
+			}
+		};
+	});
+
+/**
+* @ngdoc directive
+* @name umbraco.directives.directive:fixNumber
+* @restrict A
+* @description Used in conjunction with type='number' input fields to ensure that the bound value is converted to a number when using ng-model
+*  because normally it thinks it's a string and also validation doesn't work correctly due to an angular bug.
+**/
+function fixNumber($parse) {
+    return {
+        restrict: "A",
+        require: "ngModel",
+
+        link: function (scope, elem, attrs, ctrl) {
+
+            //parse ngModel onload
+            var modelVal = scope.$eval(attrs.ngModel);
+            if (modelVal) {
+                var asNum = parseFloat(modelVal, 10);
+                if (!isNaN(asNum)) {
+                    $parse(attrs.ngModel).assign(scope, asNum);
+                }
+            }
+
+            //always return an int to the model
+            ctrl.$parsers.push(function (value) {
+                return parseFloat(value || '', 10);
+            });
+
+            //always try to format the model value as an int
+            ctrl.$formatters.push(function (value) {
+                if (angular.isString(value)) {
+                    return parseFloat(value, 10);
+                }
+                return value;
+            });
+
+            //This fixes this angular issue: 
+            //https://github.com/angular/angular.js/issues/2144
+            // which doesn't actually validate the number input properly since the model only changes when a real number is entered
+            // but the input box still allows non-numbers to be entered which do not validate (only via html5)
+            if (typeof elem.prop('validity') === 'undefined') {
+                return;
+            }
+
+            elem.bind('input', function (e) {
+                var validity = elem.prop('validity');
+                scope.$apply(function () {
+                    ctrl.$setValidity('number', !validity.badInput);
+                });
+            });
+        }
+    };
+}
+angular.module('umbraco.directives').directive("fixNumber", fixNumber);
+/**
+* @ngdoc directive
+* @name umbraco.directives.directive:headline
+**/
+angular.module("umbraco.directives")
+  .directive('hotkey', function ($window, keyboardService, $log) {
+
+      return function (scope, el, attrs) {
+          
+          //support data binding
+    
+          var keyCombo = scope.$eval(attrs["hotkey"]);
+          if (!keyCombo) {
+              keyCombo = attrs["hotkey"];
+          }
+
+          keyboardService.bind(keyCombo, function() {
+              var element = $(el);
+
+              if(element.is("a,button,input[type='button'],input[type='submit']") && !element.is(':disabled') ){
+                element.click();
+              }else{
+                element.focus();
+              }
+          });
+          
+      };
+  });
+angular.module("umbraco.directives")
+.directive('localize', function ($log, localizationService) {
+    return {
+        restrict: 'E',
+        scope:{
+            key: '@'
+        },
+        replace: true,
+        link: function (scope, element, attrs) {
+            var key = scope.key;
+            localizationService.localize(key).then(function(value){
+                element.html(value);
+            });
+        }
+    };
+})
+.directive('localize', function ($log, localizationService) {
+    return {
+        restrict: 'A',
+        link: function (scope, element, attrs) {
+            var keys = attrs.localize.split(',');
+
+            angular.forEach(keys, function(value, key){
+                var attr = element.attr(value);
+                if(attr){
+                    if(attr[0] === '@'){
+                        var t = localizationService.tokenize(attr.substring(1), scope);
+                        localizationService.localize(t.key, t.tokens).then(function(val){
+                                element.attr(value, val);
+                        });
+                    }
+                }
+            });
+
+        }
+    };
+});
+/**
+* @ngdoc directive
+* @name umbraco.directives.directive:preventDefault
+**/
+angular.module("umbraco.directives")
+    .directive('preventDefault', function() {
+        return function(scope, element, attrs) {
+
+            var enabled = true;
+            //check if there's a value for the attribute, if there is and it's false then we conditionally don't 
+            //prevent default.
+            if (attrs.preventDefault) {
+                attrs.$observe("preventDefault", function (newVal) {
+                    enabled = (newVal === "false" || newVal === 0 || newVal === false) ? false : true;
+                });
+            }
+
+            $(element).click(function (event) {
+                if (event.metaKey || event.ctrlKey) {
+                    return;
+                }
+                else {
+                    if (enabled === true) {
+                        event.preventDefault();
+                    }
+                }
+            });
+        };
+    });
+/**
+ * @ngdoc directive
+ * @name umbraco.directives.directive:resizeToContent
+ * @element div
+ * @function
+ *
+ * @description
+ * Resize iframe's automatically to fit to the content they contain
+ *
+ * @example
+   <example module="umbraco.directives">
+     <file name="index.html">
+         <iframe resize-to-content src="meh.html"></iframe>
+     </file>
+   </example>
+ */
+angular.module("umbraco.directives")
+  .directive('resizeToContent', function ($window, $timeout) {
+    return function (scope, el, attrs) {
+       var iframe = el[0];
+       var iframeWin = iframe.contentWindow || iframe.contentDocument.parentWindow;
+       if (iframeWin.document.body) {
+
+          $timeout(function(){
+              var height = iframeWin.document.documentElement.scrollHeight || iframeWin.document.body.scrollHeight;
+              el.height(height);
+          }, 3000);
+       }
+    };
+  });
+
+angular.module("umbraco.directives")
+  .directive('selectOnFocus', function () {
+    return function (scope, el, attrs) {
+        $(el).bind("click", function () {
+            var editmode = $(el).data("editmode");
+            //If editmode is true a click is handled like a normal click
+            if (!editmode) {
+                //Initial click, select entire text
+                this.select();
+                //Set the edit mode so subsequent clicks work normally
+                $(el).data("editmode", true);
+            }
+        }).
+        bind("blur", function () {
+            //Reset on focus lost
+            $(el).data("editmode", false);
+        });
+    };
+  });
+
+/**
  * General-purpose validator for ngModel.
  * angular.js comes with several built-in validation mechanism for input fields (ngRequired, ngPattern etc.) but using
  * an arbitrary validation function requires creation of a custom formatters and / or parsers.
@@ -2130,7 +2628,7 @@ angular.module('umbraco.directives.validation')
 * Another thing this directive does is to ensure that any .control-group that contains form elements that are invalid will
 * be marked with the 'error' css class. This ensures that labels included in that control group are styled correctly.
 **/
-function valFormManager(serverValidationManager) {
+function valFormManager(serverValidationManager, $rootScope, $log, $timeout, notificationsService) {
     return {
         require: "form",
         restrict: "A",
@@ -2167,8 +2665,46 @@ function valFormManager(serverValidationManager) {
 
             //listen for the forms saved event
             scope.$on(savedEvent, function (ev, args) {
+                //remove validation class
                 element.removeClass(className);
+
+                //clear form state as at this point we retrieve new data from the server
+                //and all validation will have cleared at this point    
+                formCtrl.$setPristine();
             });
+
+            //if we wish to turn of the unsaved changes confirmation msg
+            //this is the place to do it
+            var locationEvent = $rootScope.$on('$locationChangeStart', function (event, nextLocation, currentLocation) {
+                    if (!formCtrl.$dirty) {
+                        return;
+                    }
+                    
+                    var path = nextLocation.split("#")[1];
+                    if (path) {
+                        if (path.indexOf("%253") || path.indexOf("%252")) {
+                            path = decodeURIComponent(path);
+                        }
+
+                        if(!notificationsService.hasView()){
+                            var msg = { view: "confirmroutechange", args: { path: path, listener: locationEvent } };
+                            notificationsService.add(msg);
+                        }
+                        
+                        event.preventDefault();
+                    }
+                    
+            });
+
+            scope.$on('$destroy', function() {
+                if(locationEvent){
+                    locationEvent();
+                }
+            });
+
+            $timeout(function(){
+                formCtrl.$setPristine();
+            }, 1000);
         }
     };
 }

@@ -29,7 +29,7 @@ namespace Service
             return facebookEvents == null ? null : ConvertEventsToDto(facebookEvents);
         }
 
-        public IEnumerable<dynamic> GetFacebookEvents(string creatorId, DateTime @from, DateTime to)
+        public IEnumerable<dynamic> GetFacebookEvents(long creatorId, DateTime @from, DateTime to)
         {
 
             dynamic facebookEvents = ((JsonArray)(_facebookClient.Get("/fql",

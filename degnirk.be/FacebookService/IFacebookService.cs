@@ -8,7 +8,7 @@ namespace Service
     {
         IEnumerable<ExpandoObject> GetLatestFacebookEvents(long creatorId, short numberOfEvents);
 
-        IEnumerable<dynamic> GetFacebookEvents(string creatorId, DateTime from, DateTime to);
+        IEnumerable<dynamic> GetFacebookEvents(long creatorId, DateTime @from, DateTime to);
 
         IEnumerable<ExpandoObject> GetFacebookAlbums(long creatorId);
 

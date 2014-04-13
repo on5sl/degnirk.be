@@ -35,7 +35,7 @@ namespace degnirk.be.Controllers
             }
             else
             {
-                member.getProperty(LastLogin).Value = DateTime.Now;
+                member.getProperty(LastLogin).Value = DateTime.Now.ToString();
                 member.Save();
             }
 

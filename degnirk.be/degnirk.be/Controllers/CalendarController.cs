@@ -36,7 +36,7 @@ namespace degnirk.be.Controllers
             var dateTimeTo = UnixTimeHelper.UnixTime(to);
             var events = new List<dynamic>();
             events.AddRange(
-                this._facebookService.GetFacebookEvents(ConfigurationManager.AppSettings["FacebookPageId"], dateTimeFrom, dateTimeTo));
+                this._facebookService.GetFacebookEvents(long.Parse(ConfigurationManager.AppSettings["FacebookPageId"]), dateTimeFrom, dateTimeTo));
             events.AddRange(
                 this._googleService.GetEvents(dateTimeFrom, dateTimeTo));
             

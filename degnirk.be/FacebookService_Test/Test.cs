@@ -9,7 +9,7 @@ namespace FacebookService_Test
     public class Test
     {
         private const string AccessToken = "442171809217325|Q3rA6b68G7TuWYF1beRUNsLUe94";
-        private const string PageId = "56615007038";
+        private const long PageId = 56615007038;
         private FacebookService _facebookService;
 
         [SetUp]

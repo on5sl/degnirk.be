@@ -47,6 +47,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DTO\DTO.csproj">
+      <Project>{afb1e37c-f583-4ab9-aa82-7c8875c6597c}</Project>
+      <Name>DTO</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FacebookService\FacebookService.csproj">
       <Project>{C80A57D0-ADBC-4CDF-B44C-F6BF187D999A}</Project>
       <Name>FacebookService</Name>

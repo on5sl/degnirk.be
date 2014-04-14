@@ -1,3 +1,5 @@
+@using degnirk.be.Models;
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<FacebookEventsModel>
 <a href="evenementen">
     <h3>Evenementen</h3>
 </a>
@@ -5,9 +7,9 @@
     @foreach (var facebookEvent in Model.FacebookEvents)
     {
         <li class="list-group-item">
-            <span class="badge">@facebookEvent.attendingCount</span>
-            <p class="list-group-item-heading"><a href="@facebookEvent.link">@facebookEvent.name</a></p>
-            <a class="facebook-event-img" href="@facebookEvent.link" style="background-image: url(@facebookEvent.picCover)">
+            <span class="badge">facebookEvent.AttendingCount</span>
+            <p class="list-group-item-heading"><a href="@facebookEvent.url">@facebookEvent.title</a></p>
+            <a class="facebook-event-img" href="@facebookEvent.url" style="background-image: url(facebookEvent.CoverPicture)">
                 @*<img class="img-responsive img-rounded" src="@facebookEvent.picCover" alt="@facebookEvent.name" />*@
             </a>
         </li>

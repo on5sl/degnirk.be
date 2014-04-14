@@ -5,6 +5,9 @@ using System.Dynamic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+
+using DTO;
+
 using Helpers;
 using Service;
 using Umbraco.Web.Mvc;
@@ -34,11 +37,11 @@ namespace degnirk.be.Controllers
         {
             var dateTimeFrom = UnixTimeHelper.UnixTime(from);
             var dateTimeTo = UnixTimeHelper.UnixTime(to);
-            var events = new List<dynamic>();
+            var events = new List<AjaxCalendarItem>();
             events.AddRange(
                 this._facebookService.GetFacebookEvents(long.Parse(ConfigurationManager.AppSettings["FacebookPageId"]), dateTimeFrom, dateTimeTo));
-            events.AddRange(
-                this._googleService.GetEvents(dateTimeFrom, dateTimeTo));
+            //events.AddRange(
+            //    this._googleService.GetEvents(dateTimeFrom, dateTimeTo));
             
             dynamic result = new
             {

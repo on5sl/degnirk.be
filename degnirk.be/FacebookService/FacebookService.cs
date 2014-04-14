@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+
+using DTO;
+
 using Facebook;
 using Helpers;
 
@@ -18,7 +21,7 @@ namespace Service
             _facebookClient = new FacebookClient(accessToken);
         }
 
-        public IEnumerable<ExpandoObject> GetLatestFacebookEvents(long creatorId, short numberOfEvents)
+        public IEnumerable<AjaxCalendarItem> GetLatestFacebookEvents(long creatorId, short numberOfEvents)
         {
             dynamic facebookEvents = ((JsonArray)(_facebookClient.Get("/fql",
                 new
@@ -29,7 +32,7 @@ namespace Service
             return facebookEvents == null ? null : ConvertEventsToDto(facebookEvents);
         }
 
-        public IEnumerable<dynamic> GetFacebookEvents(long creatorId, DateTime @from, DateTime to)
+        public IEnumerable<AjaxCalendarItem> GetFacebookEvents(long creatorId, DateTime @from, DateTime to)
         {
 
             dynamic facebookEvents = ((JsonArray)(_facebookClient.Get("/fql",
@@ -45,13 +48,14 @@ namespace Service
             return ConvertEventsToCalendarDto(facebookEvents);
         }
 
-        private static IEnumerable<dynamic> ConvertEventsToCalendarDto(dynamic events)
+        private static IEnumerable<AjaxCalendarItem> ConvertEventsToCalendarDto(dynamic events)
         {
             if(events == null) yield break;
             var enumerable = events as IEnumerable<dynamic>;
             if(enumerable == null) yield break;
             foreach (var fbevent in enumerable)
-                yield return new
+            {
+                yield return new AjaxCalendarItem()
                 {
                     id = fbevent.eid,
                     title = fbevent.name,
@@ -60,22 +64,27 @@ namespace Service
                     start = UnixTimeHelper.UnixTime(DateTime.Parse(fbevent.start_time)),
                     end = UnixTimeHelper.UnixTime(DateTime.Parse(fbevent.start_time))
                 };
+            }
         }
 
-        private static IEnumerable<ExpandoObject> ConvertEventsToDto(dynamic facebookEvents)
+        private static IEnumerable<AjaxCalendarItem> ConvertEventsToDto(dynamic facebookEvents)
         {
-            if (facebookEvents == null) yield break;
+            if (facebookEvents == null)
+                yield break;
             var enumerable = facebookEvents as IEnumerable<dynamic>;
-            if (enumerable == null) yield break;
-            foreach (dynamic fbevent in enumerable)
-                yield return new
+            if (enumerable == null)
+                yield break;
+            foreach (var fbevent in enumerable)
+            {
+                yield return new AjaxCalendarItem()
                 {
-                    name = fbevent.name, 
-                    link = EventUri + fbevent.eid, 
-                    attendingCount = fbevent.attending_count, 
-                    picCover = fbevent.pic_cover.source, 
-                    startTime = fbevent.start_time
-                }.ToExpando();
+                    title = fbevent.name,
+                    url = EventUri + fbevent.eid,
+                    //AttendingCount = fbevent.attending_count,
+                    //CoverPicture = fbevent.pic_cover.source,
+                    start = UnixTimeHelper.UnixTime(DateTime.Parse(fbevent.start_time))
+                };
+            }
         }
 
         public IEnumerable<ExpandoObject> GetFacebookAlbums(long creatorId)

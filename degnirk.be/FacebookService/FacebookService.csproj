@@ -52,6 +52,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DTO\DTO.csproj">
+      <Project>{AFB1E37C-F583-4AB9-AA82-7C8875C6597C}</Project>
+      <Name>DTO</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Helpers\Helpers.csproj">
       <Project>{5D60AFF9-A38F-416E-95D9-23EA9173DE25}</Project>
       <Name>Helpers</Name>

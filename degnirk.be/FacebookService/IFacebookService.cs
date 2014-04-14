@@ -2,13 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 
+using DTO;
+
 namespace Service
 {
     public interface IFacebookService
     {
-        IEnumerable<ExpandoObject> GetLatestFacebookEvents(long creatorId, short numberOfEvents);
+        IEnumerable<AjaxCalendarItem> GetLatestFacebookEvents(long creatorId, short numberOfEvents);
 
-        IEnumerable<dynamic> GetFacebookEvents(long creatorId, DateTime @from, DateTime to);
+        IEnumerable<AjaxCalendarItem> GetFacebookEvents(long creatorId, DateTime @from, DateTime to);
 
         IEnumerable<ExpandoObject> GetFacebookAlbums(long creatorId);
 

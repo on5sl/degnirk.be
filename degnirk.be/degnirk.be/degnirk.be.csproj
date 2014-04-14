@@ -427,6 +427,10 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DTO\DTO.csproj">
+      <Project>{AFB1E37C-F583-4AB9-AA82-7C8875C6597C}</Project>
+      <Name>DTO</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FacebookService\FacebookService.csproj">
       <Project>{c80a57d0-adbc-4cdf-b44c-f6bf187d999a}</Project>
       <Name>FacebookService</Name>

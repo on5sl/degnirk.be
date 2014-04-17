@@ -21,7 +21,7 @@ namespace Service
             _facebookClient = new FacebookClient(accessToken);
         }
 
-        public IEnumerable<AjaxCalendarItem> GetLatestFacebookEvents(long creatorId, short numberOfEvents)
+        public IEnumerable<CalendarItem> GetLatestFacebookEvents(long creatorId, short numberOfEvents)
         {
             dynamic facebookEvents = ((JsonArray)(_facebookClient.Get("/fql",
                 new
@@ -32,7 +32,7 @@ namespace Service
             return facebookEvents == null ? null : ConvertEventsToDto(facebookEvents);
         }
 
-        public IEnumerable<AjaxCalendarItem> GetFacebookEvents(long creatorId, DateTime @from, DateTime to)
+        public IEnumerable<CalendarItem> GetFacebookEvents(long creatorId, DateTime @from, DateTime to)
         {
 
             dynamic facebookEvents = ((JsonArray)(_facebookClient.Get("/fql",
@@ -48,26 +48,26 @@ namespace Service
             return ConvertEventsToCalendarDto(facebookEvents);
         }
 
-        private static IEnumerable<AjaxCalendarItem> ConvertEventsToCalendarDto(dynamic events)
+        private static IEnumerable<CalendarItem> ConvertEventsToCalendarDto(dynamic events)
         {
             if(events == null) yield break;
             var enumerable = events as IEnumerable<dynamic>;
             if(enumerable == null) yield break;
             foreach (var fbevent in enumerable)
             {
-                yield return new AjaxCalendarItem()
+                yield return new CalendarItem()
                 {
-                    id = fbevent.eid,
-                    title = fbevent.name,
-                    url = EventUri + fbevent.eid,
-                    @class = "event-info",
-                    start = UnixTimeHelper.UnixTime(DateTime.Parse(fbevent.start_time)),
-                    end = UnixTimeHelper.UnixTime(DateTime.Parse(fbevent.start_time))
+                    Id = fbevent.eid,
+                    Title = fbevent.name,
+                    Url = EventUri + fbevent.eid,
+                    Class = "event-info",
+                    Start = DateTime.Parse(fbevent.start_time),
+                    End = DateTime.Parse(fbevent.start_time)
                 };
             }
         }
 
-        private static IEnumerable<AjaxCalendarItem> ConvertEventsToDto(dynamic facebookEvents)
+        private static IEnumerable<CalendarItem> ConvertEventsToDto(dynamic facebookEvents)
         {
             if (facebookEvents == null)
                 yield break;
@@ -76,13 +76,13 @@ namespace Service
                 yield break;
             foreach (var fbevent in enumerable)
             {
-                yield return new AjaxCalendarItem()
+                yield return new CalendarItem()
                 {
-                    title = fbevent.name,
-                    url = EventUri + fbevent.eid,
+                    Title = fbevent.name,
+                    Url = EventUri + fbevent.eid,
                     AttendingCount = fbevent.attending_count,
                     CoverPicture = fbevent.pic_cover.source,
-                    start = UnixTimeHelper.UnixTime(DateTime.Parse(fbevent.start_time))
+                    Start = DateTime.Parse(fbevent.start_time)
                 };
             }
         }

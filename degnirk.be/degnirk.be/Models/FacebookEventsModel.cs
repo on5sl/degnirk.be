@@ -7,6 +7,6 @@ namespace degnirk.be.Models
 
     public class FacebookEventsModel
     {
-        public IEnumerable<AjaxCalendarItem> FacebookEvents { get; set; }
+        public IEnumerable<CalendarItem> FacebookEvents { get; set; }
     }
 }

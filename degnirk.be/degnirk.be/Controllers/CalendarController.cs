@@ -59,12 +59,12 @@ namespace degnirk.be.Controllers
                 dateTimeTo)
                 .Select(c => new
                 {
-                    @class = c.@class,
-                    end = c.end,
-                    id = c.id,
-                    start = c.start,
-                    title = c.title,
-                    url = c.url
+                    @class = c.Class,
+                    end = UnixTimeHelper.UnixTime(c.End),
+                    id = c.Id,
+                    start = UnixTimeHelper.UnixTime(c.Start),
+                    title = c.Title,
+                    url = c.Url
                 }).Cast<dynamic>().ToList();
         }
     }

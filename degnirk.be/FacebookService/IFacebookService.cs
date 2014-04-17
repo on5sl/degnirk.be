@@ -8,9 +8,9 @@ namespace Service
 {
     public interface IFacebookService
     {
-        IEnumerable<AjaxCalendarItem> GetLatestFacebookEvents(long creatorId, short numberOfEvents);
+        IEnumerable<CalendarItem> GetLatestFacebookEvents(long creatorId, short numberOfEvents);
 
-        IEnumerable<AjaxCalendarItem> GetFacebookEvents(long creatorId, DateTime @from, DateTime to);
+        IEnumerable<CalendarItem> GetFacebookEvents(long creatorId, DateTime @from, DateTime to);
 
         IEnumerable<ExpandoObject> GetFacebookAlbums(long creatorId);
 

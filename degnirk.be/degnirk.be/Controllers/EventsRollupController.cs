@@ -5,18 +5,18 @@ using Umbraco.Web.Mvc;
 
 namespace degnirk.be.Controllers
 {
-    public class FacebookEventsController : SurfaceController
+    public class EventsRollupController : SurfaceController
     {
         [OutputCache(Duration = 3600, VaryByParam = "facebookAppAccessToken;facebookPageId;numberOfEvents")]
         [ChildActionOnly]
-        public PartialViewResult GetFacebookEvents(string facebookAppAccessToken, long facebookPageId, short numberOfEvents)
+        public PartialViewResult GetEvents(string facebookAppAccessToken, long facebookPageId, short numberOfEvents)
         {
             var facebookService = new FacebookService(facebookAppAccessToken);
-            var model = new FacebookEventsModel
+            var model = new EventsRollupModel
             {
-                FacebookEvents = facebookService.GetLatestFacebookEvents(facebookPageId, numberOfEvents)
+                Events = facebookService.GetLatestFacebookEvents(facebookPageId, numberOfEvents)
             };
-            return PartialView("FacebookEvents", model);
+            return PartialView("EventsRollup", model);
         }
     }
 }

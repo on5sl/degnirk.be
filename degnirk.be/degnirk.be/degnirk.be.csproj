@@ -256,7 +256,7 @@
   <ItemGroup>
     <Compile Include="Controllers\CalendarController.cs" />
     <Compile Include="Controllers\PictureAlbumsController.cs" />
-    <Compile Include="Controllers\FacebookEventsController.cs" />
+    <Compile Include="Controllers\EventsRollupController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\RentalController.cs" />
@@ -265,7 +265,7 @@
     </Compile>
     <Compile Include="Models\CalendarModel.cs" />
     <Compile Include="Models\PictureAlbumsModel.cs" />
-    <Compile Include="Models\FacebookEventsModel.cs" />
+    <Compile Include="Models\EventsRollupModel.cs" />
     <Compile Include="Models\HomeModel.cs" />
     <Compile Include="Models\RentalModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -383,7 +383,7 @@
     </Content>
     <Content Include="Views\home.cshtml" />
     <Content Include="Views\master.cshtml" />
-    <Content Include="Views\Partials\FacebookEvents.cshtml" />
+    <Content Include="Views\Partials\EventsRollup.cshtml" />
     <Content Include="Views\content.cshtml" />
     <Content Include="Views\page.cshtml" />
     <Content Include="Views\Partials\PictureAlbums.cshtml" />

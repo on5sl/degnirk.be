@@ -3,7 +3,7 @@ using DTO;
 
 namespace degnirk.be.Models
 {
-    public class FacebookAlbumsModel
+    public class PictureAlbumsModel
     {
         public List<PictureAlbum> Albums { get; set; }
     }

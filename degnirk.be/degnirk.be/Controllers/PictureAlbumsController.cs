@@ -6,17 +6,17 @@ using Umbraco.Web.Mvc;
 
 namespace degnirk.be.Controllers
 {
-    public class FacebookAlbumsController : SurfaceController
+    public class PictureAlbumsController : SurfaceController
     {
         [ChildActionOnly]
         public PartialViewResult GetFacebookAlbums(string facebookAppAccessToken, long facebookPageId)
         {
             var facebookService = new FacebookService(facebookAppAccessToken);
-            var model = new FacebookAlbumsModel
+            var model = new PictureAlbumsModel
             {
                 Albums = facebookService.GetFacebookAlbums(facebookPageId).ToList()
             };
-            return PartialView("FacebookAlbums", model);
+            return PartialView("PictureAlbums", model);
         }
     }
 }

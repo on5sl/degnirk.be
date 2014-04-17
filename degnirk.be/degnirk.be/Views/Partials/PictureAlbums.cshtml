@@ -1,0 +1,16 @@
+﻿@using degnirk.be.Models
+
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<PictureAlbumsModel>
+
+<div id="facebookAlbums" class="row">
+    @foreach (var pictureAlbum in Model.Albums)
+    {
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 text-center">
+            <a href="@pictureAlbum.SourceUrl">
+                <img src="@pictureAlbum.LargeCoverPictureUrl" alt="@pictureAlbum.Name" class="img-thumbnail"/></a>
+            <a href="@pictureAlbum.SourceUrl">
+                <h5>@pictureAlbum.Name</h5>
+            </a>
+        </div>
+    }
+</div>

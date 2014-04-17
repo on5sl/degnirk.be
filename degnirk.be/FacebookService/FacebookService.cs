@@ -14,6 +14,7 @@ namespace Service
     public class FacebookService : IFacebookService
     {
         private const string EventUri = "https://www.facebook.com/events/";
+        private const string EventInfo = "event-info";
         private readonly FacebookClient _facebookClient;
 
         public FacebookService(string accessToken)
@@ -29,7 +30,7 @@ namespace Service
                     q = string.Format("select eid,  name, attending_count, pic_cover, start_time from event where creator = {0} ORDER BY start_time desc limit {1}", creatorId, numberOfEvents)
                 }) as dynamic).data);
 
-            return facebookEvents == null ? null : ConvertEventsToDto(facebookEvents);
+            return facebookEvents == null ? null : ConvertToCalendarItems(facebookEvents);
         }
 
         public IEnumerable<CalendarItem> GetFacebookEvents(long creatorId, DateTime @from, DateTime to)
@@ -45,10 +46,10 @@ namespace Service
                                       "ORDER BY start_time desc", creatorId, from.ToString("s"), to.ToString("s"))
                 }) as dynamic).data);
 
-            return ConvertEventsToCalendarDto(facebookEvents);
+            return ConvertToCalendarItems(facebookEvents);
         }
 
-        private static IEnumerable<CalendarItem> ConvertEventsToCalendarDto(dynamic events)
+        private static IEnumerable<CalendarItem> ConvertToCalendarItems(dynamic events)
         {
             if(events == null) yield break;
             var enumerable = events as IEnumerable<dynamic>;
@@ -60,29 +61,11 @@ namespace Service
                     Id = fbevent.eid,
                     Title = fbevent.name,
                     Url = EventUri + fbevent.eid,
-                    Class = "event-info",
-                    Start = DateTime.Parse(fbevent.start_time),
-                    End = DateTime.Parse(fbevent.start_time)
-                };
-            }
-        }
-
-        private static IEnumerable<CalendarItem> ConvertEventsToDto(dynamic facebookEvents)
-        {
-            if (facebookEvents == null)
-                yield break;
-            var enumerable = facebookEvents as IEnumerable<dynamic>;
-            if (enumerable == null)
-                yield break;
-            foreach (var fbevent in enumerable)
-            {
-                yield return new CalendarItem()
-                {
-                    Title = fbevent.name,
-                    Url = EventUri + fbevent.eid,
+                    Class = EventInfo,
                     AttendingCount = fbevent.attending_count,
                     CoverPicture = fbevent.pic_cover.source,
-                    Start = DateTime.Parse(fbevent.start_time)
+                    Start = DateTime.Parse(fbevent.start_time),
+                    End = DateTime.Parse(fbevent.start_time)
                 };
             }
         }

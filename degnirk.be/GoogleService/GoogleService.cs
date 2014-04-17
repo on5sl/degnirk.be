@@ -1,16 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.Web;
 using DTO;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Calendar.v3;
 using Google.Apis.Calendar.v3.Data;
 using Google.Apis.Services;
-using Helpers;
 
-namespace Service
+namespace Service.Google
 {
     public class GoogleService : IGoogleService
     {
@@ -77,7 +76,7 @@ namespace Service
                 {
                     Title = @event.Summary,
                     Url = string.Empty,
-                    @Class = EventWarning,
+                    Class = EventWarning,
                     Start = @event.Start.DateTime.HasValue
                         ? @event.Start.DateTime.Value
                         : DateTime.Parse(@event.Start.Date),

@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 
 using DTO;
 
-namespace Service
+namespace Services.Facebook
 {
     public interface IFacebookService
     {

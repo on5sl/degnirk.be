@@ -431,9 +431,13 @@
       <Project>{AFB1E37C-F583-4AB9-AA82-7C8875C6597C}</Project>
       <Name>DTO</Name>
     </ProjectReference>
-    <ProjectReference Include="..\FacebookService\FacebookService.csproj">
+    <ProjectReference Include="..\FacebookService\Services.Facebook.csproj">
       <Project>{c80a57d0-adbc-4cdf-b44c-f6bf187d999a}</Project>
-      <Name>FacebookService</Name>
+      <Name>Services.Facebook</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GoogleService\Services.Google.csproj">
+      <Project>{5F090A88-1497-4E76-B899-7DC285A7C6CE}</Project>
+      <Name>Services.Google</Name>
     </ProjectReference>
     <ProjectReference Include="..\Helpers\Helpers.csproj">
       <Project>{5D60AFF9-A38F-416E-95D9-23EA9173DE25}</Project>

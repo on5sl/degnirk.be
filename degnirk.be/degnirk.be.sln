@@ -14,17 +14,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{47860B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Service", "Service", "{7B2477BA-02FB-4E2E-956C-49FAA4C0F67C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FacebookService_Test", "FacebookService_Test\FacebookService_Test.csproj", "{F94BA6B7-D190-439E-8E6C-87EE1D6E19E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services.Facebook_Test", "FacebookService_Test\Services.Facebook_Test.csproj", "{F94BA6B7-D190-439E-8E6C-87EE1D6E19E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FacebookService", "FacebookService\FacebookService.csproj", "{C80A57D0-ADBC-4CDF-B44C-F6BF187D999A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services.Facebook", "FacebookService\Services.Facebook.csproj", "{C80A57D0-ADBC-4CDF-B44C-F6BF187D999A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Helpers", "Helpers", "{810656D6-C31B-4FD4-AC97-EC49E86C72F3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpers", "Helpers\Helpers.csproj", "{5D60AFF9-A38F-416E-95D9-23EA9173DE25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleService", "GoogleService\GoogleService.csproj", "{5F090A88-1497-4E76-B899-7DC285A7C6CE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services.Google", "GoogleService\Services.Google.csproj", "{5F090A88-1497-4E76-B899-7DC285A7C6CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleService_Test", "GoogleService_Test\GoogleService_Test.csproj", "{F22B20B1-FC3E-4DBD-B52E-9BC236892C73}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services.Google_Test", "GoogleService_Test\Services.Google_Test.csproj", "{F22B20B1-FC3E-4DBD-B52E-9BC236892C73}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DTO", "DTO", "{19F42FA4-63FD-4A4C-ADF9-FF735BDA724F}"
 EndProject

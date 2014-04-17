@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
-
 using DTO;
-
 using Facebook;
-using Helpers;
 
-namespace Service
+namespace Services.Facebook
 {
     public class FacebookService : IFacebookService
     {

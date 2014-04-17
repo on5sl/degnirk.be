@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using DTO;
 
-namespace Service
+namespace Service.Google
 {
     public interface IGoogleService
     {

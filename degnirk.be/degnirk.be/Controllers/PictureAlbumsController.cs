@@ -1,7 +1,9 @@
 ﻿using System.Linq;
 using System.Web.Mvc;
 using degnirk.be.Models;
-using Service;
+
+using Services.Facebook;
+
 using Umbraco.Web.Mvc;
 
 namespace degnirk.be.Controllers

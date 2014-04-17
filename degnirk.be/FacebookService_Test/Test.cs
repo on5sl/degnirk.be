@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
-using Service;
+using Services.Facebook;
+using DTO;
 
 namespace FacebookService_Test
 {

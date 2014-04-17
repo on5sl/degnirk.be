@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Configuration;
 using System.Globalization;
-using System.Web.Helpers;
 using System.Web.Mvc;
-using Service;
+using Services.Facebook;
 using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.member;

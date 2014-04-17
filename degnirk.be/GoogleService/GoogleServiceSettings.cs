@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Service
+﻿namespace Service.Google
 {
     public class GoogleServiceSettings : IGoogleServiceSettings
     {
@@ -13,12 +7,12 @@ namespace Service
         public string Email { get; set; }
         public string ApplicationName { get; set; }
 
-        public GoogleServiceSettings(string ClientIDforNativeApplication, string ClientSecret, string Email, string ApplicationName)
+        public GoogleServiceSettings(string clientIDforNativeApplication, string clientSecret, string email, string applicationName)
         {
-            this.ClientIDforNativeApplication = ClientIDforNativeApplication;
-            this.ClientSecret = ClientSecret;
-            this.Email = Email;
-            this.ApplicationName = ApplicationName;
+            this.ClientIDforNativeApplication = clientIDforNativeApplication;
+            this.ClientSecret = clientSecret;
+            this.Email = email;
+            this.ApplicationName = applicationName;
         }
     }
 }

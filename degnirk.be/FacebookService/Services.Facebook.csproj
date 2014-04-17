@@ -7,8 +7,8 @@
     <ProjectGuid>{C80A57D0-ADBC-4CDF-B44C-F6BF187D999A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FacebookService</RootNamespace>
-    <AssemblyName>FacebookService</AssemblyName>
+    <RootNamespace>Services.Facebook</RootNamespace>
+    <AssemblyName>Services.Facebook</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>

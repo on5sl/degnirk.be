@@ -80,8 +80,8 @@ namespace Service
                 {
                     title = fbevent.name,
                     url = EventUri + fbevent.eid,
-                    //AttendingCount = fbevent.attending_count,
-                    //CoverPicture = fbevent.pic_cover.source,
+                    AttendingCount = fbevent.attending_count,
+                    CoverPicture = fbevent.pic_cover.source,
                     start = UnixTimeHelper.UnixTime(DateTime.Parse(fbevent.start_time))
                 };
             }

@@ -6,6 +6,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
+using degnirk.be.Models;
+
 using DTO;
 
 using Helpers;
@@ -37,11 +39,9 @@ namespace degnirk.be.Controllers
         {
             var dateTimeFrom = UnixTimeHelper.UnixTime(from);
             var dateTimeTo = UnixTimeHelper.UnixTime(to);
-            var events = new List<AjaxCalendarItem>();
+            var events = GetFacebookEvents(dateTimeFrom, dateTimeTo);
             events.AddRange(
-                this._facebookService.GetFacebookEvents(long.Parse(ConfigurationManager.AppSettings["FacebookPageId"]), dateTimeFrom, dateTimeTo));
-            //events.AddRange(
-            //    this._googleService.GetEvents(dateTimeFrom, dateTimeTo));
+                this._googleService.GetEvents(dateTimeFrom, dateTimeTo));
             
             dynamic result = new
             {
@@ -49,6 +49,23 @@ namespace degnirk.be.Controllers
                 result = events
             };
             return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        private List<dynamic> GetFacebookEvents(DateTime dateTimeFrom, DateTime dateTimeTo)
+        {
+            return this._facebookService.GetFacebookEvents(
+                long.Parse(ConfigurationManager.AppSettings["FacebookPageId"]),
+                dateTimeFrom,
+                dateTimeTo)
+                .Select(c => new
+                {
+                    @class = c.@class,
+                    end = c.end,
+                    id = c.id,
+                    start = c.start,
+                    title = c.title,
+                    url = c.url
+                }).Cast<dynamic>().ToList();
         }
     }
 }

@@ -7,9 +7,9 @@
     @foreach (var facebookEvent in Model.FacebookEvents)
     {
         <li class="list-group-item">
-            <span class="badge">facebookEvent.AttendingCount</span>
+            <span class="badge">@facebookEvent.AttendingCount</span>
             <p class="list-group-item-heading"><a href="@facebookEvent.url">@facebookEvent.title</a></p>
-            <a class="facebook-event-img" href="@facebookEvent.url" style="background-image: url(facebookEvent.CoverPicture)">
+            <a class="facebook-event-img" href="@facebookEvent.url" style="background-image: url(@facebookEvent.CoverPicture)">
                 @*<img class="img-responsive img-rounded" src="@facebookEvent.picCover" alt="@facebookEvent.name" />*@
             </a>
         </li>

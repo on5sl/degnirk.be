@@ -5,11 +5,8 @@ using System.Dynamic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-
 using degnirk.be.Models;
-
 using DTO;
-
 using Helpers;
 using Service;
 using Umbraco.Web.Mvc;
@@ -40,8 +37,7 @@ namespace degnirk.be.Controllers
             var dateTimeFrom = UnixTimeHelper.UnixTime(from);
             var dateTimeTo = UnixTimeHelper.UnixTime(to);
             var events = GetFacebookEvents(dateTimeFrom, dateTimeTo);
-            events.AddRange(
-                this._googleService.GetEvents(dateTimeFrom, dateTimeTo));
+            events.AddRange(GetGoogleEvents(dateTimeFrom,dateTimeTo));
             
             dynamic result = new
             {
@@ -51,21 +47,34 @@ namespace degnirk.be.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        private List<dynamic> GetGoogleEvents(DateTime from, DateTime to)
+        {
+            var googleEvents = this._googleService.GetEvents(from, to);
+            return ConvertToAjaxObject(googleEvents);
+        }
+
         private List<dynamic> GetFacebookEvents(DateTime dateTimeFrom, DateTime dateTimeTo)
         {
-            return this._facebookService.GetFacebookEvents(
+            var facebookEvents = this._facebookService.GetFacebookEvents(
                 long.Parse(ConfigurationManager.AppSettings["FacebookPageId"]),
                 dateTimeFrom,
-                dateTimeTo)
-                .Select(c => new
-                {
-                    @class = c.Class,
-                    end = UnixTimeHelper.UnixTime(c.End),
-                    id = c.Id,
-                    start = UnixTimeHelper.UnixTime(c.Start),
-                    title = c.Title,
-                    url = c.Url
-                }).Cast<dynamic>().ToList();
+                dateTimeTo);
+
+            return ConvertToAjaxObject(facebookEvents);
+        }
+
+        private static List<dynamic> ConvertToAjaxObject(IEnumerable<CalendarItem> events)
+        {
+            var objects = events.Select(c => new
+            {
+                @class = c.Class,
+                end = UnixTimeHelper.UnixTime(c.End),
+                id = c.Id,
+                start = UnixTimeHelper.UnixTime(c.Start),
+                title = c.Title,
+                url = c.Url
+            }).Cast<dynamic>().ToList();
+            return objects;
         }
     }
 }

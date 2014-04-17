@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Web;
+using DTO;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Calendar.v3;
 using Google.Apis.Calendar.v3.Data;
@@ -17,15 +18,15 @@ namespace Service
         private const string EventWarning = "event-warning";
 
         public readonly GoogleServiceSettings GoogleServiceSettings;
-        private readonly List<dynamic> _events;
+        private readonly List<CalendarItem> _events;
 
         public GoogleService(GoogleServiceSettings googleServiceSettings)
         {
-            _events = new List<dynamic>();
+            _events = new List<CalendarItem>();
             this.GoogleServiceSettings = googleServiceSettings;
         }
 
-        public IEnumerable<dynamic> GetEvents(DateTime from, DateTime to)
+        public IEnumerable<CalendarItem> GetEvents(DateTime from, DateTime to)
         {
             var task = GetGoogleEvents(from, to);
             task.Wait();
@@ -72,18 +73,17 @@ namespace Service
         {
             foreach (var @event in events)
             {
-                _events.Add(new
+                _events.Add(new CalendarItem()
                 {
-                    id = @event.Id,
-                    title = @event.Summary,
-                    url = string.Empty,
-                    @class = EventWarning,
-                    start = @event.Start.DateTime.HasValue
-                        ? UnixTimeHelper.UnixTime(@event.Start.DateTime.Value)
-                        : UnixTimeHelper.UnixTime(DateTime.Parse(@event.Start.Date)),
-                    end = @event.End.DateTime.HasValue
-                        ? UnixTimeHelper.UnixTime(@event.End.DateTime.Value)
-                        : UnixTimeHelper.UnixTime(DateTime.Parse(@event.End.Date))
+                    Title = @event.Summary,
+                    Url = string.Empty,
+                    @Class = EventWarning,
+                    Start = @event.Start.DateTime.HasValue
+                        ? @event.Start.DateTime.Value
+                        : DateTime.Parse(@event.Start.Date),
+                    End = @event.End.DateTime.HasValue
+                        ? @event.End.DateTime.Value
+                        : DateTime.Parse(@event.End.Date)
                 });
             }
         }

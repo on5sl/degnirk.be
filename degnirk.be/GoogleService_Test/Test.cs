@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using Service;
+using DTO;
 
 namespace GoogleService_Test
 {

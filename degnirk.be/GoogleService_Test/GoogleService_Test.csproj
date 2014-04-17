@@ -60,6 +60,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DTO\DTO.csproj">
+      <Project>{afb1e37c-f583-4ab9-aa82-7c8875c6597c}</Project>
+      <Name>DTO</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GoogleService\GoogleService.csproj">
       <Project>{5f090a88-1497-4e76-b899-7dc285a7c6ce}</Project>
       <Name>GoogleService</Name>

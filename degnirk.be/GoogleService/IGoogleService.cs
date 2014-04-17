@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using DTO;
 
 namespace Service
 {
     public interface IGoogleService
     {
-        IEnumerable<dynamic> GetEvents(DateTime @from, DateTime to);
+        IEnumerable<CalendarItem> GetEvents(DateTime @from, DateTime to);
     }
 }

@@ -3,13 +3,13 @@
 @inherits Umbraco.Web.Mvc.UmbracoViewPage<FacebookAlbumsModel>
 
 <div id="facebookAlbums" class="row">
-    @foreach (var facebookAlbum in Model.FacebookAlbums)
+    @foreach (var facebookAlbum in Model.Albums)
     {
         <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 text-center">
-            <a href="@facebookAlbum.link">
-                <img src="@facebookAlbum.srcBig" alt="@facebookAlbum.name" class="img-thumbnail"/></a>
-            <a href="@facebookAlbum.link">
-                <h5>@facebookAlbum.name</h5>
+            <a href="@facebookAlbum.SourceUrl">
+                <img src="@facebookAlbum.LargeCoverPictureUrl" alt="@facebookAlbum.Name" class="img-thumbnail"/></a>
+            <a href="@facebookAlbum.SourceUrl">
+                <h5>@facebookAlbum.Name</h5>
             </a>
         </div>
     }

@@ -12,7 +12,7 @@ namespace Service
 
         IEnumerable<CalendarItem> GetFacebookEvents(long creatorId, DateTime @from, DateTime to);
 
-        IEnumerable<ExpandoObject> GetFacebookAlbums(long creatorId);
+        IEnumerable<PictureAlbum> GetFacebookAlbums(long creatorId);
 
         dynamic GetCurrentUser();
     }

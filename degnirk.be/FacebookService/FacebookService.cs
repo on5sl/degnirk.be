@@ -70,7 +70,7 @@ namespace Service
             }
         }
 
-        public IEnumerable<ExpandoObject> GetFacebookAlbums(long creatorId)
+        public IEnumerable<PictureAlbum> GetFacebookAlbums(long creatorId)
         {
             dynamic facebookAlbums = _facebookClient.Get("/fql",
                 new
@@ -98,18 +98,17 @@ namespace Service
             return _facebookClient.Get("me", new { fields = "name, id, email, birthday, location, link" });
         }
 
-
-        private static IEnumerable<ExpandoObject> ConvertAlbumsToDto(IEnumerable<dynamic> coverPidsFqlResultSet, IEnumerable<dynamic> coverSrcsFqlResultSet)
+        private static IEnumerable<PictureAlbum> ConvertAlbumsToDto(IEnumerable<dynamic> coverPidsFqlResultSet, IEnumerable<dynamic> coverSrcsFqlResultSet)
         {
-            return coverPidsFqlResultSet.Join(coverSrcsFqlResultSet, album => album.aid, photo => photo.aid, (album, photo) => new
+            return coverPidsFqlResultSet.Join(coverSrcsFqlResultSet, album => album.aid, photo => photo.aid, (album, photo) => new PictureAlbum()
             {
-                name = album.name,
-                link = album.link,
-                aid = album.aid,
-                coverPid = album.cover_pid,
-                src = photo.src,
-                srcBig = photo.src_big
-            }.ToExpando());
+                Id = album.aid,
+                Name = album.name,
+                SourceUrl = album.link,
+                CoverPictureId = album.cover_pid,
+                CoverPictureThumbUrl = photo.src,
+                LargeCoverPictureUrl = photo.src_big
+            });
         }
     }
 }

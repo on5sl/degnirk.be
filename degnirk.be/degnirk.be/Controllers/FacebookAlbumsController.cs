@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Linq;
+using System.Web.Mvc;
 using degnirk.be.Models;
 using Service;
 using Umbraco.Web.Mvc;
@@ -13,7 +14,7 @@ namespace degnirk.be.Controllers
             var facebookService = new FacebookService(facebookAppAccessToken);
             var model = new FacebookAlbumsModel
             {
-                FacebookAlbums = facebookService.GetFacebookAlbums(facebookPageId)
+                Albums = facebookService.GetFacebookAlbums(facebookPageId).ToList()
             };
             return PartialView("FacebookAlbums", model);
         }

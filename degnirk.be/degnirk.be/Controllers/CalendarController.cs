@@ -34,7 +34,7 @@ namespace degnirk.be.Controllers
         {
             var dateTimeFrom = UnixTimeHelper.UnixTime(from);
             var dateTimeTo = UnixTimeHelper.UnixTime(to);
-            var events = GetFacebookEvents(dateTimeFrom, dateTimeTo);
+            var events = GetFacebookEvents(dateTimeFrom, dateTimeTo).ToList();
             events.AddRange(GetGoogleEvents(dateTimeFrom,dateTimeTo));
             
             dynamic result = new
@@ -45,13 +45,13 @@ namespace degnirk.be.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
-        private List<dynamic> GetGoogleEvents(DateTime from, DateTime to)
+        private IEnumerable<dynamic> GetGoogleEvents(DateTime from, DateTime to)
         {
             var googleEvents = this._googleService.GetEvents(from, to);
             return ConvertToAjaxObject(googleEvents);
         }
 
-        private List<dynamic> GetFacebookEvents(DateTime dateTimeFrom, DateTime dateTimeTo)
+        private IEnumerable<dynamic> GetFacebookEvents(DateTime dateTimeFrom, DateTime dateTimeTo)
         {
             var facebookEvents = this._facebookService.GetFacebookEvents(
                 long.Parse(ConfigurationManager.AppSettings["FacebookPageId"]),
@@ -61,7 +61,7 @@ namespace degnirk.be.Controllers
             return ConvertToAjaxObject(facebookEvents);
         }
 
-        private static List<dynamic> ConvertToAjaxObject(IEnumerable<CalendarItem> events)
+        private static IEnumerable<dynamic> ConvertToAjaxObject(IEnumerable<CalendarItem> events)
         {
             var objects = events.Select(c => new
             {

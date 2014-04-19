@@ -53,7 +53,6 @@ namespace Services.Facebook
             {
                 yield return new CalendarItem()
                 {
-                    Id = fbevent.eid,
                     Title = fbevent.name,
                     Url = EventUri + fbevent.eid,
                     Class = EventInfo,

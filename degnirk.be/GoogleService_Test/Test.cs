@@ -1,8 +1,9 @@
 ﻿using System;
-using Service.Google;
+
 using NUnit.Framework;
 using DTO;
 
+using Services.Google;
 
 namespace GoogleService_Test
 {

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
+
 using DTO;
 using Facebook;
 
@@ -29,6 +31,11 @@ namespace Services.Facebook
                 }) as dynamic).data);
 
             return facebookEvents == null ? null : ConvertToCalendarItems(facebookEvents);
+        }
+
+        public Task<IEnumerable<CalendarItem>> GetEventsTask(DateTime @from, DateTime to)
+        {
+            return Task.Factory.StartNew(() => GetEvents(from, to));
         }
 
         public IEnumerable<CalendarItem> GetEvents(DateTime @from, DateTime to)

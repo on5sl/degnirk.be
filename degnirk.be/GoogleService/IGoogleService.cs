@@ -1,10 +1,4 @@
-using System;
-using System.Collections.Generic;
-using DTO;
-
-using Services;
-
-namespace Service.Google
+namespace Services.Google
 {
     public interface IGoogleService : ICalendarServices
     {

@@ -1,4 +1,4 @@
-﻿namespace Service.Google
+﻿namespace Services.Google
 {
     public class GoogleServiceSettings : IGoogleServiceSettings
     {

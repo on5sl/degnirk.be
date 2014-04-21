@@ -1,38 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using DTO;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Calendar.v3;
 using Google.Apis.Calendar.v3.Data;
+using Google.Apis.Http;
 using Google.Apis.Services;
+using DTO;
 
-namespace Service.Google
+namespace Services.Google
 {
     public class GoogleService : IGoogleService
     {
         // See calendar.css for more styles available
         private const string EventWarning = "event-warning";
 
-        public readonly GoogleServiceSettings GoogleServiceSettings;
-        private readonly List<CalendarItem> _events;
+        public readonly IGoogleServiceSettings GoogleServiceSettings;
 
-        public GoogleService(GoogleServiceSettings googleServiceSettings)
+        public GoogleService(IGoogleServiceSettings googleServiceSettings)
         {
-            _events = new List<CalendarItem>();
             this.GoogleServiceSettings = googleServiceSettings;
         }
 
         public IEnumerable<CalendarItem> GetEvents(DateTime from, DateTime to)
         {
-            var task = GetGoogleEvents(from, to);
-            task.Wait();
-            return _events;
-
+            return GetEventsTask(from, to).Result;
         }
-        private async Task GetGoogleEvents(DateTime from, DateTime to)
+
+        public async Task<IEnumerable<CalendarItem>> GetEventsTask(DateTime from, DateTime to)
         {
             var userCredential = await GetUserCredential();
             var calendarService = GetCalendarService(userCredential);
@@ -43,10 +41,10 @@ namespace Service.Google
 
             var result = query.Execute();
 
-            ConvertToCalendarDto(result.Items);
+            return ConvertToCalendarDto(result.Items);
         }
 
-        private CalendarService GetCalendarService(UserCredential userCredential)
+        private CalendarService GetCalendarService(IConfigurableHttpClientInitializer userCredential)
         {
             return new CalendarService(new BaseClientService.Initializer()
             {
@@ -68,23 +66,20 @@ namespace Service.Google
                 CancellationToken.None);
         }
 
-        private void ConvertToCalendarDto(IEnumerable<Event> events)
+        private static IEnumerable<CalendarItem> ConvertToCalendarDto(IEnumerable<Event> events)
         {
-            foreach (var @event in events)
+            return events.Select(@event => new CalendarItem()
             {
-                _events.Add(new CalendarItem()
-                {
-                    Title = @event.Summary,
-                    Url = string.Empty,
-                    Class = EventWarning,
-                    Start = @event.Start.DateTime.HasValue
-                        ? @event.Start.DateTime.Value
-                        : DateTime.Parse(@event.Start.Date),
-                    End = @event.End.DateTime.HasValue
-                        ? @event.End.DateTime.Value
-                        : DateTime.Parse(@event.End.Date)
-                });
-            }
+                Title = @event.Summary,
+                Url = string.Empty,
+                Class = EventWarning,
+                Start = @event.Start.DateTime.HasValue
+                    ? @event.Start.DateTime.Value
+                    : DateTime.Parse(@event.Start.Date),
+                End = @event.End.DateTime.HasValue
+                    ? @event.End.DateTime.Value
+                    : DateTime.Parse(@event.End.Date)
+            });
         }
     }
 }

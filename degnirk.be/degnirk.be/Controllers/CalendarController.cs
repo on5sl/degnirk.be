@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Web.Mvc;
 using DTO;
-using Service.Google;
+
 using Helpers;
 
 using Services;
 using Services.Facebook;
+using Services.Google;
+
 using Umbraco.Web.Mvc;
 
 namespace degnirk.be.Controllers
@@ -37,29 +38,18 @@ namespace degnirk.be.Controllers
         {
             var dateTimeFrom = UnixTimeHelper.UnixTime(from);
             var dateTimeTo = UnixTimeHelper.UnixTime(to);
-            var events = GetFacebookEvents(dateTimeFrom, dateTimeTo).ToList();
-            events.AddRange(GetGoogleEvents(dateTimeFrom,dateTimeTo));
+            var facebookTask = _facebookService.GetEventsTask(dateTimeFrom, dateTimeTo);
+            var googleTask = _googleService.GetEventsTask(dateTimeFrom, dateTimeTo);
+
+            var events = googleTask.Result.ToList();
+            events.AddRange(facebookTask.Result);
             
             dynamic result = new
             {
                 success = 1,
-                result = events
+                result = ConvertToAjaxObject(events)
             };
             return Json(result, JsonRequestBehavior.AllowGet);
-        }
-
-        private IEnumerable<dynamic> GetGoogleEvents(DateTime from, DateTime to)
-        {
-            var googleEvents = this._googleService.GetEvents(from, to);
-            return ConvertToAjaxObject(googleEvents);
-        }
-
-        private IEnumerable<dynamic> GetFacebookEvents(DateTime dateTimeFrom, DateTime dateTimeTo)
-        {
-            var facebookEvents = this._facebookService.GetEvents(dateTimeFrom,
-                dateTimeTo);
-
-            return ConvertToAjaxObject(facebookEvents);
         }
 
         private static IEnumerable<dynamic> ConvertToAjaxObject(IEnumerable<CalendarItem> events)

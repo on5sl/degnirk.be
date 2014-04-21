@@ -13,10 +13,10 @@ namespace degnirk.be.Controllers
         [ChildActionOnly]
         public PartialViewResult GetEvents(string facebookAppAccessToken, long facebookPageId, short numberOfEvents)
         {
-            var facebookService = new FacebookService(facebookAppAccessToken);
+            var facebookService = new FacebookService(facebookAppAccessToken, facebookPageId);
             var model = new EventsRollupModel
             {
-                Events = facebookService.GetLatestFacebookEvents(facebookPageId, numberOfEvents)
+                Events = facebookService.GetLatestFacebookEvents(numberOfEvents)
             };
             return PartialView("EventsRollup", model);
         }

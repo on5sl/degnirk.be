@@ -13,7 +13,7 @@ namespace degnirk.be.Controllers
         [ChildActionOnly]
         public PartialViewResult GetFacebookAlbums(string facebookAppAccessToken, long facebookPageId)
         {
-            var facebookService = new FacebookService(facebookAppAccessToken);
+            var facebookService = new FacebookService(facebookAppAccessToken, facebookPageId);
             var model = new PictureAlbumsModel
             {
                 Albums = facebookService.GetFacebookAlbums(facebookPageId).ToList()

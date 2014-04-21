@@ -13,8 +13,8 @@ namespace degnirk.be.Controllers
 {
     public class CalendarController : SurfaceController
     {
-        private readonly GoogleService _googleService;
-        private readonly FacebookService _facebookService;
+        private readonly IGoogleService _googleService;
+        private readonly IFacebookService _facebookService;
 
         public CalendarController()
         {
@@ -26,7 +26,8 @@ namespace degnirk.be.Controllers
             this._googleService = new GoogleService(googleServiceSettings);
 
             this._facebookService = new FacebookService(
-                ConfigurationManager.AppSettings["FacebookAppAccessToken"]);
+                ConfigurationManager.AppSettings["FacebookAppAccessToken"], 
+                long.Parse(ConfigurationManager.AppSettings["FacebookPageId"]));
         }
 
         //[OutputCache(Duration = 3600, VaryByParam = "from;to;browser_timezone")]
@@ -53,9 +54,7 @@ namespace degnirk.be.Controllers
 
         private IEnumerable<dynamic> GetFacebookEvents(DateTime dateTimeFrom, DateTime dateTimeTo)
         {
-            var facebookEvents = this._facebookService.GetFacebookEvents(
-                long.Parse(ConfigurationManager.AppSettings["FacebookPageId"]),
-                dateTimeFrom,
+            var facebookEvents = this._facebookService.GetFacebookEvents(dateTimeFrom,
                 dateTimeTo);
 
             return ConvertToAjaxObject(facebookEvents);

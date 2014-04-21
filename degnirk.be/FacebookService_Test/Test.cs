@@ -16,20 +16,20 @@ namespace FacebookService_Test
         [SetUp]
         public void SetUp()
         {
-            _facebookService = new FacebookService(AccessToken);
+            _facebookService = new FacebookService(AccessToken, PageId);
         }
 
         [Test]
         public void Get_Latest_Event()
         {
-            var facebookEvents = _facebookService.GetLatestFacebookEvents(PageId, 1);
+            var facebookEvents = _facebookService.GetLatestFacebookEvents(1);
             Assert.AreEqual(1, facebookEvents.Count());
         }
 
         [Test]
         public void Get_Latest_Events()
         {
-            var facebookEvents = _facebookService.GetLatestFacebookEvents(PageId, 3);
+            var facebookEvents = _facebookService.GetLatestFacebookEvents(3);
             Assert.AreEqual(3, facebookEvents.Count());
         }
 
@@ -43,9 +43,7 @@ namespace FacebookService_Test
         [Test]
         public void Get_Last_Three_Months_Of_Events()
         {
-            var facebookEvents = _facebookService.GetFacebookEvents(
-                PageId,
-                DateTime.Now.AddMonths(-2),
+            var facebookEvents = _facebookService.GetFacebookEvents(DateTime.Now.AddMonths(-2),
                 DateTime.Now.AddMonths(1));
             Assert.IsNotNull(facebookEvents);
         }

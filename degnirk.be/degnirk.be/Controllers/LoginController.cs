@@ -23,7 +23,7 @@ namespace degnirk.be.Controllers
         {
             HttpContext.Session["AccessToken"] = accessToken;
 
-            var facebookService = new FacebookService(accessToken);
+            var facebookService = new FacebookService(accessToken, long.Parse(ConfigurationManager.AppSettings["FacebookPageId"]));
             var user = facebookService.GetCurrentUser();
             
             Member member = Member.GetMemberFromEmail(user.email);

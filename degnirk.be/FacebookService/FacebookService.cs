@@ -11,24 +11,26 @@ namespace Services.Facebook
         private const string EventUri = "https://www.facebook.com/events/";
         private const string EventInfo = "event-info";
         private readonly FacebookClient _facebookClient;
+        private readonly long _creatorId;
 
-        public FacebookService(string accessToken)
+        public FacebookService(string accessToken, long creatorId)
         {
             _facebookClient = new FacebookClient(accessToken);
+            _creatorId = creatorId;
         }
 
-        public IEnumerable<CalendarItem> GetLatestFacebookEvents(long creatorId, short numberOfEvents)
+        public IEnumerable<CalendarItem> GetLatestFacebookEvents(short numberOfEvents)
         {
             dynamic facebookEvents = ((JsonArray)(_facebookClient.Get("/fql",
                 new
                 {
-                    q = string.Format("select eid,  name, attending_count, pic_cover, start_time from event where creator = {0} ORDER BY start_time desc limit {1}", creatorId, numberOfEvents)
+                    q = string.Format("select eid,  name, attending_count, pic_cover, start_time from event where creator = {0} ORDER BY start_time desc limit {1}", _creatorId, numberOfEvents)
                 }) as dynamic).data);
 
             return facebookEvents == null ? null : ConvertToCalendarItems(facebookEvents);
         }
 
-        public IEnumerable<CalendarItem> GetFacebookEvents(long creatorId, DateTime @from, DateTime to)
+        public IEnumerable<CalendarItem> GetFacebookEvents(DateTime @from, DateTime to)
         {
 
             dynamic facebookEvents = ((JsonArray)(_facebookClient.Get("/fql",
@@ -38,7 +40,7 @@ namespace Services.Facebook
                                       "where creator = {0} " +
                                       "AND start_time >= '{1}' " +
                                       "AND start_time <= '{2}' " +
-                                      "ORDER BY start_time desc", creatorId, from.ToString("s"), to.ToString("s"))
+                                      "ORDER BY start_time desc", _creatorId, from.ToString("s"), to.ToString("s"))
                 }) as dynamic).data);
 
             return ConvertToCalendarItems(facebookEvents);

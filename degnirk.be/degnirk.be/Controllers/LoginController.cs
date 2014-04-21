@@ -6,9 +6,9 @@ using DTO;
 
 using Services.Facebook;
 using umbraco;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.member;
+
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Mvc;
 
@@ -16,6 +16,15 @@ namespace degnirk.be.Controllers
 {
     public class LoginController : SurfaceController
     {
+        private readonly IMemberService _memberService;
+        private readonly IMemberTypeService _memberTypeService;
+
+        public LoginController()
+        {
+            _memberService = this.Services.MemberService;
+            _memberTypeService = this.Services.MemberTypeService;
+        }
+
         private const string Birthday = "birthday";
         private const string Location = "location";
         private const string Link = "link";
@@ -28,7 +37,7 @@ namespace degnirk.be.Controllers
             var facebookService = new FacebookService(accessToken, long.Parse(ConfigurationManager.AppSettings["FacebookPageId"]));
             var user = facebookService.GetCurrentUser();
             
-            Member member = Member.GetMemberFromEmail(user.Email);
+            var member = _memberService.GetByEmail(user.Email);
             if (member == null)
             {
                 MakeNewUmbracoMember(user);
@@ -36,8 +45,8 @@ namespace degnirk.be.Controllers
             }
             else
             {
-                member.getProperty(LastLogin).Value = DateTime.Now.ToString();
-                member.Save();
+                member.LastLoginDate = DateTime.Now;
+                _memberService.Save(member);
             }
 
             return Json(new
@@ -75,23 +84,13 @@ namespace degnirk.be.Controllers
             }
         }
 
-        private static void MakeNewUmbracoMember(DeGnirkMember user)
+        private void MakeNewUmbracoMember(DeGnirkMember user)
         {
-            // Then we make the member in Umbraco
-            Member member = Member.MakeNew(user.Name, user.Email, user.Email, MemberType.GetByAlias("Member"),
-                new User(0));
-            member.ChangePassword(System.Web.Security.Membership.GeneratePassword(10, 2));
-            member.getProperty(Birthday).Value = user.DateOfBirth;
-            member.getProperty(Location).Value = user.Location;
-            member.getProperty(Link).Value = user.FacebookLink;
-            Member.AddMemberToCache(member);
-            member.Save();
-
-            //TODO: When the new member api is finished use this
-            /*var cs = Services.ContentService;
-            var content = cs.GetById(member.Id);
-            content.SetValue("birthday", DateTime.Now);
-            cs.PublishWithStatus(content);*/
+            var member = _memberService.CreateMember(user.Name, user.Email, user.Name, _memberTypeService.Get("Member"));
+            member.SetValue(Birthday, user.DateOfBirth);
+            member.SetValue(Location, user.Location);
+            member.SetValue(Link, user.FacebookLink);
+            _memberService.Save(member);
         }
     }
 }

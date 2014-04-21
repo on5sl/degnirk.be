@@ -11,6 +11,6 @@ namespace Services.Facebook
 
         IEnumerable<PictureAlbum> GetFacebookAlbums(long creatorId);
 
-        dynamic GetCurrentUser();
+        DeGnirkMember GetCurrentUser();
     }
 }

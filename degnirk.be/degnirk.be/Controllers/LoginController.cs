@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Configuration;
-using System.Globalization;
 using System.Web.Mvc;
+
+using DTO;
+
 using Services.Facebook;
 using umbraco;
 using umbraco.BusinessLogic;
@@ -26,7 +28,7 @@ namespace degnirk.be.Controllers
             var facebookService = new FacebookService(accessToken, long.Parse(ConfigurationManager.AppSettings["FacebookPageId"]));
             var user = facebookService.GetCurrentUser();
             
-            Member member = Member.GetMemberFromEmail(user.email);
+            Member member = Member.GetMemberFromEmail(user.Email);
             if (member == null)
             {
                 MakeNewUmbracoMember(user);
@@ -40,48 +42,48 @@ namespace degnirk.be.Controllers
 
             return Json(new
             {
-                id = user.id,
-                name = user.name,
-                email = user.email
+                id = user.FacebookId,
+                name = user.Name,
+                email = user.Email
             });
         }
 
-        private static void SendNewMemberMail(dynamic user)
+        private static void SendNewMemberMail(DeGnirkMember user)
         {
             try
             {
                 library.SendMail(ConfigurationManager.AppSettings["infoEmail"],
                     "jhdegnirk@gmail.com",
-                    string.Format("Nieuw lid {0} heeft zich ingeschreven via de website", user.name),
+                    string.Format("Nieuw lid {0} heeft zich ingeschreven via de website", user.Name),
                     string.Format("{0} heeft zich ingeschreven, dit zijn de gegevens:\r\n" +
                                   "Naam: {1}\r\n" +
                                   "Geboortedatum: {2}\r\n" +
                                   "Vervaldatum: {3}\r\n" +
                                   "Plaats: {4}",
-                        user.name,
-                        user.name,
-                        ParseFacebookBirthday(user),
+                        user.Name,
+                        user.Name,
+                        user.DateOfBirth,
                         DateTime.Now.AddYears(1),
-                        user.location["name"]
+                        user.Location
                         ),
                     false);
             }
             catch (Exception exception)
             {
-                LogHelper.Error<LogController>(string.Format("Notification mail for {0} not sent", user.name), exception);
+                LogHelper.Error<LogController>(string.Format("Notification mail for {0} not sent", user.Name), exception);
                 throw;
             }
         }
 
-        private static void MakeNewUmbracoMember(dynamic user)
+        private static void MakeNewUmbracoMember(DeGnirkMember user)
         {
             // Then we make the member in Umbraco
-            Member member = Member.MakeNew(user.name, user.email, user.email, MemberType.GetByAlias("Member"),
+            Member member = Member.MakeNew(user.Name, user.Email, user.Email, MemberType.GetByAlias("Member"),
                 new User(0));
             member.ChangePassword(System.Web.Security.Membership.GeneratePassword(10, 2));
-            member.getProperty(Birthday).Value = ParseFacebookBirthday(user);
-            member.getProperty(Location).Value = user.location["name"];
-            member.getProperty(Link).Value = user.link;
+            member.getProperty(Birthday).Value = user.DateOfBirth;
+            member.getProperty(Location).Value = user.Location;
+            member.getProperty(Link).Value = user.FacebookLink;
             Member.AddMemberToCache(member);
             member.Save();
 
@@ -90,19 +92,6 @@ namespace degnirk.be.Controllers
             var content = cs.GetById(member.Id);
             content.SetValue("birthday", DateTime.Now);
             cs.PublishWithStatus(content);*/
-        }
-
-        private static DateTime ParseFacebookBirthday(dynamic user)
-        {
-            try
-            {
-                return DateTime.ParseExact(user.birthday, "MM/dd/yyyy", new CultureInfo("en-US"), DateTimeStyles.None);
-            }
-            catch (Exception exception)
-            {
-                LogHelper.Error<LogController>(string.Format("The format of {0} could not be parsed to the birthday date for {1}.", user.birthday, user.name), exception);
-                return DateTime.MinValue;
-            }
         }
     }
 }

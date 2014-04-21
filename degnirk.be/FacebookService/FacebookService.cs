@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using DTO;
 using Facebook;
@@ -89,9 +90,18 @@ namespace Services.Facebook
             return ConvertAlbumsToDto(coverPidsFqlResultSet, coverSrcsFqlResultSet);
         }
 
-        public dynamic GetCurrentUser()
+        public DeGnirkMember GetCurrentUser()
         {
-            return _facebookClient.Get("me", new { fields = "name, id, email, birthday, location, link" });
+            dynamic user = _facebookClient.Get("me", new { fields = "name, id, email, birthday, location, link" });
+            return new DeGnirkMember()
+            {
+                Email = user.email,
+                FacebookId = long.Parse(user.id),
+                FacebookLink = user.link,
+                Name = user.name,
+                DateOfBirth = DateTime.ParseExact(user.birthday, "MM/dd/yyyy", new CultureInfo("en-US"), DateTimeStyles.None),
+                Location = user.location["name"]
+            };
         }
 
         private static IEnumerable<PictureAlbum> ConvertAlbumsToDto(IEnumerable<dynamic> coverPidsFqlResultSet, IEnumerable<dynamic> coverSrcsFqlResultSet)

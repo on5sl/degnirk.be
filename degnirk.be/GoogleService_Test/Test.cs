@@ -3,12 +3,13 @@ using Service.Google;
 using NUnit.Framework;
 using DTO;
 
+
 namespace GoogleService_Test
 {
     [TestFixture]
     public class Test
     {
-        private GoogleService _googleService;
+        private IGoogleService _googleService;
         // See https://console.developers.google.com fore more info
         private const string ClientIDforNativeApplication = "539942760355-ndbtaf1pi3iih0o31m6sh47vh16gr8h4.apps.googleusercontent.com";
         private const string ClientSecret = "L4XjviYSsciNU1TpvExREotB";

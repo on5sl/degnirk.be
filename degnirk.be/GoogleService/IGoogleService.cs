@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using DTO;
 
+using Services;
+
 namespace Service.Google
 {
-    public interface IGoogleService
+    public interface IGoogleService : ICalendarServices
     {
-        IEnumerable<CalendarItem> GetEvents(DateTime @from, DateTime to);
     }
 }

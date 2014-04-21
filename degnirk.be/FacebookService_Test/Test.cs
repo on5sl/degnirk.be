@@ -11,7 +11,7 @@ namespace FacebookService_Test
     {
         private const string AccessToken = "442171809217325|Q3rA6b68G7TuWYF1beRUNsLUe94";
         private const long PageId = 56615007038;
-        private FacebookService _facebookService;
+        private IFacebookService _facebookService;
 
         [SetUp]
         public void SetUp()
@@ -43,7 +43,7 @@ namespace FacebookService_Test
         [Test]
         public void Get_Last_Three_Months_Of_Events()
         {
-            var facebookEvents = _facebookService.GetFacebookEvents(DateTime.Now.AddMonths(-2),
+            var facebookEvents = _facebookService.GetEvents(DateTime.Now.AddMonths(-2),
                 DateTime.Now.AddMonths(1));
             Assert.IsNotNull(facebookEvents);
         }

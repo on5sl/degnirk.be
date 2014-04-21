@@ -60,6 +60,10 @@
       <Project>{5D60AFF9-A38F-416E-95D9-23EA9173DE25}</Project>
       <Name>Helpers</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Services\Services.csproj">
+      <Project>{cb5e76b3-707c-414f-bd39-b84c82440bdd}</Project>
+      <Name>Services</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

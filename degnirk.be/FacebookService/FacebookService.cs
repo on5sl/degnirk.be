@@ -30,7 +30,7 @@ namespace Services.Facebook
             return facebookEvents == null ? null : ConvertToCalendarItems(facebookEvents);
         }
 
-        public IEnumerable<CalendarItem> GetFacebookEvents(DateTime @from, DateTime to)
+        public IEnumerable<CalendarItem> GetEvents(DateTime @from, DateTime to)
         {
 
             dynamic facebookEvents = ((JsonArray)(_facebookClient.Get("/fql",

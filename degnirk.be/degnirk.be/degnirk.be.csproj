@@ -443,6 +443,10 @@
       <Project>{5D60AFF9-A38F-416E-95D9-23EA9173DE25}</Project>
       <Name>Helpers</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Services\Services.csproj">
+      <Project>{CB5E76B3-707C-414F-BD39-B84C82440BDD}</Project>
+      <Name>Services</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

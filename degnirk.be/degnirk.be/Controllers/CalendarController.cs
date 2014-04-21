@@ -6,6 +6,8 @@ using System.Web.Mvc;
 using DTO;
 using Service.Google;
 using Helpers;
+
+using Services;
 using Services.Facebook;
 using Umbraco.Web.Mvc;
 
@@ -13,8 +15,8 @@ namespace degnirk.be.Controllers
 {
     public class CalendarController : SurfaceController
     {
-        private readonly IGoogleService _googleService;
-        private readonly IFacebookService _facebookService;
+        private readonly ICalendarServices _googleService;
+        private readonly ICalendarServices _facebookService;
 
         public CalendarController()
         {
@@ -54,7 +56,7 @@ namespace degnirk.be.Controllers
 
         private IEnumerable<dynamic> GetFacebookEvents(DateTime dateTimeFrom, DateTime dateTimeTo)
         {
-            var facebookEvents = this._facebookService.GetFacebookEvents(dateTimeFrom,
+            var facebookEvents = this._facebookService.GetEvents(dateTimeFrom,
                 dateTimeTo);
 
             return ConvertToAjaxObject(facebookEvents);

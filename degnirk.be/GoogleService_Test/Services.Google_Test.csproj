@@ -68,6 +68,10 @@
       <Project>{5f090a88-1497-4e76-b899-7dc285a7c6ce}</Project>
       <Name>Services.Google</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Services\Services.csproj">
+      <Project>{CB5E76B3-707C-414F-BD39-B84C82440BDD}</Project>
+      <Name>Services</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

@@ -33,7 +33,7 @@ namespace degnirk.be.Controllers
                 long.Parse(ConfigurationManager.AppSettings["FacebookPageId"]));
         }
 
-        //[OutputCache(Duration = 3600, VaryByParam = "from;to;browser_timezone")]
+        [OutputCache(Duration = 3600, VaryByParam = "from;to;browser_timezone")]
         public ActionResult GetEvents(long from, long to, string browser_timezone)
         {
             var dateTimeFrom = UnixTimeHelper.UnixTime(from);
@@ -41,8 +41,8 @@ namespace degnirk.be.Controllers
             var facebookTask = _facebookService.GetEventsTask(dateTimeFrom, dateTimeTo);
             var googleTask = _googleService.GetEventsTask(dateTimeFrom, dateTimeTo);
 
-            var events = googleTask.Result.ToList();
-            events.AddRange(facebookTask.Result);
+            var events = facebookTask.Result.ToList();
+            events.AddRange(googleTask.Result);
             
             dynamic result = new
             {

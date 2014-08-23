@@ -139,6 +139,23 @@ h2 a:hover, h1 a:hover, h2 a:focus, h1 a:focus {
 
 .facebook-event-img {
     height: 100px;
+    width: 100px;
     display: block;
+    -ms-background-size: cover;
     background-size: cover;
+    background-position: center;
+    -webkit-filter: blur(10px);
+    -moz-filter: blur(10px);
+    -o-filter: blur(10px);
+    filter: blur(10px);
+    -ms-border-radius: 50px;
+    border-radius: 50px;
+}
+
+.event-date {
+    /*height: inherit;*/
+    vertical-align: middle;
+    width: inherit;
+    text-align: center;
+    display: inherit;
 }

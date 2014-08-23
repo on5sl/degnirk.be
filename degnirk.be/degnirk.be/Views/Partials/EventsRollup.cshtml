@@ -10,6 +10,7 @@
             <span class="badge">@eventItem.AttendingCount</span>
             <p class="list-group-item-heading"><a href="@eventItem.Url">@eventItem.Title</a></p>
             <a class="facebook-event-img" href="@eventItem.Url" style="background-image: url(@eventItem.CoverPicture)">
+                <p class="event-date">@eventItem.Start.ToString("MM")<br/>@eventItem.Start.ToString("dd")</p>
                 @*<img class="img-responsive img-rounded" src="@facebookEvent.picCover" alt="@facebookEvent.name" />*@
             </a>
         </li>

@@ -9,15 +9,16 @@ namespace degnirk.be.Controllers
 {
     public class EventsRollupController : SurfaceController
     {
-        [OutputCache(Duration = 3600, VaryByParam = "facebookAppAccessToken;facebookPageId;numberOfEvents")]
+        //[OutputCache(Duration = 3600, VaryByParam = "facebookAppAccessToken;facebookPageId;numberOfEvents")]
         [ChildActionOnly]
-        public PartialViewResult GetEvents(string facebookAppAccessToken, long facebookPageId, short numberOfEvents)
+        public PartialViewResult GetEvents(EventsRollupModel model)
         {
-            var facebookService = new FacebookService(facebookAppAccessToken, facebookPageId);
-            var model = new EventsRollupModel
+            if (!ModelState.IsValid)
             {
-                Events = facebookService.GetLatestFacebookEvents(numberOfEvents)
-            };
+                
+            }
+            var facebookService = new FacebookService(model.FacebookAppAccessToken, model.FacebookPageId);
+            model.Events = facebookService.GetLatestFacebookEvents(model.NumberOfEvents);
             return PartialView("EventsRollup", model);
         }
     }

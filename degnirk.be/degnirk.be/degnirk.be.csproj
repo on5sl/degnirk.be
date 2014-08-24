@@ -319,10 +319,10 @@
     <None Include="Properties\PublishProfiles\Local IIS.pubxml" />
     <Content Include="scripts\dummy.txt" />
     <Content Include="scripts\home.js" />
-    <None Include="scripts\jquery-2.1.0.intellisense.js" />
-    <Content Include="scripts\jquery-2.1.0.js" />
-    <Content Include="scripts\jquery-2.1.0.min.js" />
-    <Content Include="scripts\jquery-2.1.0.min.map" />
+    <None Include="scripts\jquery-2.1.1.intellisense.js" />
+    <Content Include="scripts\jquery-2.1.1.js" />
+    <Content Include="scripts\jquery-2.1.1.min.js" />
+    <Content Include="scripts\jquery-2.1.1.min.map" />
     <None Include="scripts\jquery.validate-vsdoc.js" />
     <Content Include="scripts\jquery.backstretch.js" />
     <Content Include="scripts\jquery.validate.js" />

@@ -32,7 +32,7 @@ namespace Services.Google
 
         public async Task<IEnumerable<CalendarItem>> GetEventsTask(DateTime from, DateTime to)
         {
-            var userCredential = await GetUserCredential();
+            UserCredential userCredential = await GetUserCredential();
             var calendarService = GetCalendarService(userCredential);
 
             var query = calendarService.Events.List(this.GoogleServiceSettings.Email);
